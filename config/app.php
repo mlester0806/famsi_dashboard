@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME'),
+    'name' => env('APP_NAME', 'FAMSI'),
 
     /*
     |--------------------------------------------------------------------------
@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'env' => env('APP_ENV'),
+    'env' => env('APP_ENV', 'production'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ return [
     |
     */
 
-    'debug' => (bool) env('APP_DEBUG'),
+    'debug' => (bool) env('APP_DEBUG', false),
 
     /*
     |--------------------------------------------------------------------------
@@ -55,7 +55,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL'),
+    'url' => env('APP_URL', 'https://famsi-dashboard-ritze.ondigitalocean.app'),
 
     'asset_url' => env('ASSET_URL'),
 
