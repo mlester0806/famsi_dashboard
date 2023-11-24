@@ -17,7 +17,7 @@ return new class extends Migration
             $table->datetime('finish_time');
             $table->longText('comments')->nullable();
             $table->foreignId('applicant_id')->constrained();
-            $table->foreignId('interviewer_id')->constrained();
+            $table->unsignedBigInteger('interviewer_id');
             $table->timestamps();
         });
     }
