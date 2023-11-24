@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('job_position_id')->references('id')->on('job_positions');
             $table->string('file_name');
             $table->string('file_path');
-            $table->boolean('status');
+            $table->tinyInteger('status');
             $table->timestamps();
         });
     }
