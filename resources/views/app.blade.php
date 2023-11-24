@@ -6,7 +6,7 @@
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
-        <link rel="icon" type="image/png" href="{{url('/images/famsi_icon.png')}}" sizes="32x32">
+        <link rel="icon" type="image/png" href="{{secure_asset('/images/famsi_icon.png')}}" sizes="32x32">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
