@@ -64,9 +64,7 @@ class AuthApplicantsController extends Controller
             'status' => 0
         ]);
 
-        $token = $user->createToken('Applicant Dashboard')->plainTextToken;
-
-        return response()->json(['token' => $token], 201);
+        return response()->json(['message' => 'Applicant registered successfully']);
     }
 
     // Log in a user
@@ -150,7 +148,9 @@ class AuthApplicantsController extends Controller
             // Update the user's email_verified_at field
             $user->markEmailAsVerified();
 
-            return response()->json(['message' => 'Email verification successful.']);
+            $token = $user->createToken('Applicant Dashboard')->plainTextToken;
+
+            return response()->json(['message' => 'Email verification successful.', 'token' => $token], 201);
         } else {
             // Link has expired
             return response()->json(['message' => 'Email verification link has expired.'], 403);

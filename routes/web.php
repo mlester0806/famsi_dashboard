@@ -153,6 +153,8 @@ Route::middleware([
 
         Route::group(['prefix' => 'hired', 'as' => 'hired.'], function() {
             Route::get('/', [HiredController::class, 'index'])->name('index');
+
+            Route::put('/update/{id}', [HiredController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'documents', 'as' => 'documents.'], function() {
@@ -267,6 +269,8 @@ Route::middleware([
 
         Route::group(['prefix' => 'hired', 'as' => 'hired.'], function() {
             Route::get('/', [HiredController::class, 'index'])->name('index');
+
+            Route::put('/update/{id}', [HiredController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'documents', 'as' => 'documents.'], function() {

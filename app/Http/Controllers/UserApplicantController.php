@@ -59,6 +59,7 @@ class UserApplicantController extends Controller
             'last_name' => $applicant->last_name,
             'gender' => $applicant->gender,
             'email' => $applicant->user->email,
+            'email_verified_at' => $applicant->user->email_verified_at,
             'contact_number' => $applicant->contact_number,
             'is_active' => $applicant->user->is_active,
             'created_at' => $applicant->created_at,

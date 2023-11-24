@@ -204,7 +204,9 @@ const showUpdateModal = (data) => {
         form.filename = data.filename;
         form.path = data.path;
 
-        currentUpdatingDocumentID.value = data.id;
+        if(!currentUpdatingDocumentID.value) {
+            currentUpdatingDocumentID.value = data.id;
+        }
     }
 
     document.body.classList.add("overflow-hidden");

@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\HrManager;
 use App\Models\HrStaff;
 use App\Models\User;
+use App\Models\JobPosition;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
 use Inertia\Inertia;
@@ -21,6 +22,7 @@ class HiredController extends Controller
 
         $filters = Request::only(['search']);
         $searchReq = Request::input('search');
+        $jobPositions = JobPosition::all();
 
         $hired = Application::query()
         ->where('status', 5)
@@ -140,6 +142,7 @@ class HiredController extends Controller
         return Inertia::render('Hired', [
             'hired' => $hired,
             'filters' => $filters,
+            'jobPositions' => $jobPositions,
             'pagination' => [
                 'current_page' => $currentPage,
                 'last_page' => $lastPage,
@@ -185,7 +188,16 @@ class HiredController extends Controller
      */
     public function update($id)
     {
-        //
+        $applicantValidate = Request::validate([
+            'job_id' => ['required'],
+        ]);
+
+        $application = Application::findOrFail($id);
+        $jobPosition = JobPosition::findOrFail($applicantValidate['job_id']);
+
+        $application->job_position_id = $applicantValidate['job_id'];
+
+        $application->save();
     }
 
 }

@@ -177,7 +177,10 @@ const showUpdateModal = (data) => {
         form.title = data.title;
         form.description = data.description;
 
-        currentUpdatingJobID.value = data.id;
+        if(!currentUpdatingJobID.value) {
+            currentUpdatingJobID.value = data.id;
+        }
+        
     }
 
     document.body.classList.add("overflow-hidden");

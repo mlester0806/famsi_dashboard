@@ -184,7 +184,9 @@ const showUpdateModal = (data) => {
         form.description = data.description;
         form.job_type_id = data.job_type_id;
 
-        currentUpdatingJobID.value = data.id;
+        if(!currentUpdatingJobID.value) {
+            currentUpdatingJobID.value = data.id;
+        }
     }
 
     document.body.classList.add("overflow-hidden");
@@ -225,6 +227,12 @@ const hideAddModal = () => {
 
     form.reset();
     form.clearErrors();
+};
+
+const findJobType = (job_type_id) => {
+    const findJobTypeId = props.jobTypes.find(el => el.id == job_type_id);
+
+    return findJobTypeId.title
 };
 
 watch(
@@ -441,8 +449,7 @@ watch(
                                         class="text-base max-w-xs whitespace-normal text-gray-900 dark:text-white"
                                     >
                                         {{
-                                            props.jobTypes[role.job_type_id - 1]
-                                                .title
+                                            findJobType(role.job_type_id)
                                         }}
                                     </div>
                                 </td>
@@ -619,7 +626,7 @@ watch(
                         </span>
                     </h3>
                     <p class="text-black dark:text-white">
-                        {{ props.jobTypes[form.job_type_id - 1].title }}
+                        {{ findJobType(form.job_type_id) }}
                     </p>
                 </div>
 

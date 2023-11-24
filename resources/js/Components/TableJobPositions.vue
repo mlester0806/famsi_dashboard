@@ -238,7 +238,9 @@ const showUpdateModal = (data) => {
         form.industry_id = data.industry_id;
         form.schedule = data.schedule;
 
-        currentUpdatingJobID.value = data.id;
+        if(!currentUpdatingJobID.value) {
+            currentUpdatingJobID.value = data.id;
+        }
     }
 
     document.body.classList.add("overflow-hidden");
@@ -296,6 +298,24 @@ const updateEmployeeTypes = computed(() => {
         (val, index) => val.job_type_id == form.job_type_id
     );
 });
+
+const findJobType = (job_type_id) => {
+    const findJobTypeId = props.jobTypes.find(el => el.id == job_type_id);
+
+    return findJobTypeId.title
+};
+
+const findEmployeeType = (employee_type_id) => {
+    const findEmployeeTypeId = props.employeeTypes.find(el => el.id == employee_type_id);
+
+    return findEmployeeTypeId.title
+};
+
+const findIndustry = (industry_id) => {
+    const findIndustryId = props.industries.find(el => el.id == industry_id);
+
+    return findIndustryId.title
+};
 
 watch(
     search,
@@ -550,8 +570,7 @@ watch(
                                         class="text-base max-w-xs whitespace-normal text-gray-900 dark:text-white"
                                     >
                                         {{
-                                            props.jobTypes[role.job_type_id - 1]
-                                                .title
+                                             findJobType(role.job_type_id)
                                         }}
                                     </div>
                                 </td>
@@ -563,9 +582,7 @@ watch(
                                         class="text-base max-w-xs whitespace-normal text-gray-900 dark:text-white"
                                     >
                                         {{
-                                            props.employeeTypes[
-                                                role.employee_type_id - 1
-                                            ].title
+                                            findEmployeeType(role.employee_type_id)
                                         }}
                                     </div>
                                 </td>
@@ -576,11 +593,7 @@ watch(
                                     <div
                                         class="text-base max-w-xs whitespace-normal text-gray-900 dark:text-white"
                                     >
-                                        {{
-                                            props.industries[
-                                                role.industry_id - 1
-                                            ].title
-                                        }}
+                                        {{ findIndustry(role.industry_id) }}
                                     </div>
                                 </td>
 
@@ -777,7 +790,7 @@ watch(
                         </span>
                     </h3>
                     <p class="text-black dark:text-white">
-                        {{ props.jobTypes[form.job_type_id - 1].title }}
+                        {{ findJobType(form.job_type_id) }}
                     </p>
                 </div>
 
@@ -789,7 +802,7 @@ watch(
                     </h3>
                     <p class="text-black dark:text-white">
                         {{
-                            props.employeeTypes[form.employee_type_id - 1].title
+                            findEmployeeType(form.employee_type_id)
                         }}
                     </p>
                 </div>
@@ -801,7 +814,7 @@ watch(
                         </span>
                     </h3>
                     <p class="text-black dark:text-white">
-                        {{ props.industries[form.industry_id - 1].title }}
+                        {{ findIndustry(form.industry_id) }}
                     </p>
                 </div>
 
@@ -1024,7 +1037,7 @@ watch(
                                     (industry) => industry.is_active === 1
                                 )"
                                 :key="industry.id"
-                                :value="industry.id - 1"
+                                :value="industry.id"
                             >
                                 {{ industry.title }}
                             </option>
