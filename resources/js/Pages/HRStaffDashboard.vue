@@ -1,6 +1,5 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import TableHrStaffDashboard from "@/Components/TableHrStaffDashboard.vue";
 
 defineProps({
     applicants: Array,
