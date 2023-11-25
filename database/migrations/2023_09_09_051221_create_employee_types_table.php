@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('job_type_id')->references('id')->on('job_types');
             $table->string('title');
             $table->string('description');
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }
