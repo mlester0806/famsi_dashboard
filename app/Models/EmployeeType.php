@@ -14,6 +14,7 @@ class EmployeeType extends Model
         'job_type_id',
         'title',
         'description',
+        'is_active'
     ];
 
     public function jobPosition(): HasMany
