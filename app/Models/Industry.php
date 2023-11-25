@@ -13,6 +13,7 @@ class Industry extends Model
     protected $fillable = [
         'title',
         'description',
+        'is_active'
     ];
 
     public function jobPosition(): HasMany
