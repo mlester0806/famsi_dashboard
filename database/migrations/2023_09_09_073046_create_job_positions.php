@@ -21,6 +21,7 @@ return new class extends Migration
             $table->text('company_profile');
             $table->string('location');
             $table->string('schedule');
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
         });
     }
