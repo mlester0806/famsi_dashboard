@@ -20,7 +20,8 @@ class JobPosition extends Model
         'location',
         'job_type',
         'employment_type',
-        'schedule'
+        'schedule',
+        'is_active'
     ];
 
     public function jobType(): BelongsTo
