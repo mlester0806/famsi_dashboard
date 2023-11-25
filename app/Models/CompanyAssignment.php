@@ -12,5 +12,6 @@ class CompanyAssignment extends Model
     protected $fillable = [
         'title',
         'description',
+        'is_active'
     ];
 }
