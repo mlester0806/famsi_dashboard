@@ -35,8 +35,6 @@ const props = defineProps({
     title: String,
 });
 
-    console.log(props);
-
 const form = useForm({
     title: "",
     description: "",
@@ -969,7 +967,7 @@ watch(
 
                             <option
                                 v-for="companyAssignment in props.companyAssignments.filter(
-                                    (company) => company.is_active === 1
+                                    (company) => company.is_active
                                 )"
                                 :key="companyAssignment.id"
                                 :value="companyAssignment.title"
@@ -991,7 +989,7 @@ watch(
 
                             <option
                                 v-for="jobType in props.jobTypes.filter(
-                                    (job) => job.is_active === 1
+                                    (job) => job.is_active
                                 )"
                                 :key="jobType.id"
                                 :value="jobType.id"
@@ -1014,7 +1012,7 @@ watch(
 
                             <option
                                 v-for="employeeType in updateEmployeeTypes.filter(
-                                    (employee) => employee.is_active === 1
+                                    (employee) => employee.is_active
                                 )"
                                 :key="employeeType.id"
                                 :value="employeeType.id"
@@ -1036,7 +1034,7 @@ watch(
 
                             <option
                                 v-for="industry in props.industries.filter(
-                                    (industry) => industry.is_active === 1
+                                    (industry) => industry.is_active
                                 )"
                                 :key="industry.id"
                                 :value="industry.id"
@@ -1337,7 +1335,7 @@ watch(
 
                             <option
                                 v-for="companyAssignment in props.companyAssignments.filter(
-                                    (company) => company.is_active === 1
+                                    (company) => company.is_active
                                 )"
                                 :key="companyAssignment.id"
                                 :value="companyAssignment.title"
@@ -1359,7 +1357,7 @@ watch(
 
                             <option
                                 v-for="jobType in props.jobTypes.filter(
-                                    (job) => job.is_active === 1
+                                    (job) => job.is_active
                                 )"
                                 :key="jobType.id"
                                 :value="jobType.id"
@@ -1382,7 +1380,7 @@ watch(
 
                             <option
                                 v-for="employeeType in employeeTypesList?.filter(
-                                    (employee) => employee.is_active === 1
+                                    (employee) => employee.is_active
                                 )"
                                 :key="employeeType.id"
                                 :value="employeeType.id"
@@ -1404,7 +1402,7 @@ watch(
 
                             <option
                                 v-for="industry in props.industries.filter(
-                                    (industry) => industry.is_active === 1
+                                    (industry) => industry.is_active
                                 )"
                                 :key="industry.id"
                                 :value="industry.id"
