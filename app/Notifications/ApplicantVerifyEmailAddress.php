@@ -39,7 +39,7 @@ class ApplicantVerifyEmailAddress extends Notification
 
         return (new MailMessage)
                     ->line('Please click the button below to verify your email address.')
-                    ->action('Verify Email Address', 'http://localhost:3000' . $verificationUrl)
+                    ->action('Verify Email Address', 'https://famsi-web-a6pqk.ondigitalocean.app' . $verificationUrl)
                     ->line('Thank you for registering!');
     }
 
