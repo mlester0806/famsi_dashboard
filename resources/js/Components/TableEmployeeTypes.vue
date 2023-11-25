@@ -757,7 +757,7 @@ watch(
 
                             <option
                                 v-for="jobType in props.jobTypes.filter(
-                                    (job) => job.is_active === 1
+                                    (job) => job.is_active
                                 )"
                                 :key="jobType.id"
                                 :value="jobType.id"
@@ -1035,7 +1035,7 @@ watch(
 
                             <option
                                 v-for="jobType in props.jobTypes.filter(
-                                    (job) => job.is_active === 1
+                                    (job) => job.is_active
                                 )"
                                 :key="jobType.id"
                                 :value="jobType.id"
