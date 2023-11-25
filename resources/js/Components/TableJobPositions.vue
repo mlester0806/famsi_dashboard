@@ -35,6 +35,8 @@ const props = defineProps({
     title: String,
 });
 
+    console.log(props);
+
 const form = useForm({
     title: "",
     description: "",
