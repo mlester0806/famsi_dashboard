@@ -39,7 +39,7 @@ class ApplicantVerifyEmailAddress extends Notification
 
         return (new MailMessage)
                     ->line('Please click the button below to verify your email address.')
-                    ->action('Verify Email Address', 'https://famsi-web-a6pqk.ondigitalocean.app' . $verificationUrl)
+                    ->action('Verify Email Address', 'https://famsi-web.site' . $verificationUrl)
                     ->line('Thank you for registering!');
     }
 
