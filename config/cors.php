@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:3000', 'https://famsi-web-a6pqk.ondigitalocean.app'],
+    'allowed_origins' => ['http://localhost:3000', 'https://famsi-web-a6pqk.ondigitalocean.app', 'https://famsi-web.site'],
 
     'allowed_origins_patterns' => [],
 
