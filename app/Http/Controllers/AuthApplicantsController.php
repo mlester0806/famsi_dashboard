@@ -84,10 +84,10 @@ class AuthApplicantsController extends Controller
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
 
-        if ($user->user_type === 0 && $user->email_verifed_at) {
+        if ($user->user_type === 0 && $user->email_verified_at) {
             $token = $user->createToken('Applicant Dashboard')->plainTextToken;
             return response()->json(['token' => $token], 200);
-        } else if ($user->user_type === 0 && !$user->email_verifed_at) {
+        } else if ($user->user_type === 0 && !$user->email_verified_at) {
             return response()->json(['error' => 'You need to verify your email first.', 'title' => "Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.", 'message' => "Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another."], 401);
         } else {
             return response()->json(['error' => 'These credentials do not match our records.'], 401);
