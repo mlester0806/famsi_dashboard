@@ -807,7 +807,7 @@ watch(
 
                             <option
                                 v-for="job in props.jobPositions.filter(
-                                    (job) => job.is_active === 1
+                                    (job) => job.is_active
                                 )"
                                 :key="job.id"
                                 :value="job.id"
