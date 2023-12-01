@@ -34,7 +34,7 @@ class HiredController extends Controller
                     ->orWhereRaw('LOWER(middle_name) LIKE LOWER(?)', ['%' . $search . '%'])
                     ->orWhereRaw('LOWER(last_name) LIKE LOWER(?)', ['%' . $search . '%']);
                 });
-                $query->whereHas('job_position', function ($query) use ($search) {
+                $query->orWhereHas('jobPosition', function ($query) use ($search) {
                     $query->whereRaw('LOWER(title) LIKE LOWER(?)', ['%' . $search . '%']);
                 });
             });
