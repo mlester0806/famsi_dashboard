@@ -1,5 +1,6 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
+import TableHRStaffDashboard from "@/Components/TableHRStaffDashboard.vue";
 
 defineProps({
     applicants: Array,
@@ -10,7 +11,7 @@ defineProps({
 <template>
     <AppLayout title="Dashboard">
         <div class="px-4 pt-6">
-            <TableHrStaffDashboard
+            <TableHRStaffDashboard
                 linkName="appointments"
                 :events="events"
                 :applicants="applicants"
@@ -19,7 +20,7 @@ defineProps({
                 <template #description
                     >This is your schedules for applicant Interviews</template
                 >
-            </TableHrStaffDashboard>
+            </TableHRStaffDashboard>
         </div>
     </AppLayout>
 </template>
