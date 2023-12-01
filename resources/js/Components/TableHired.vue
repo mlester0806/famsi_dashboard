@@ -16,6 +16,8 @@ const props = defineProps({
     jobPositions: Array,
 });
 
+    console.log(props.jobPositions);
+
 const form = useForm({
     first_name: "",
     middle_name: "",
