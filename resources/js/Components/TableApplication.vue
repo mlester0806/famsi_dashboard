@@ -23,6 +23,7 @@ const form = useForm({
     contact_number: "",
     job_id: "",
     job_title: "",
+    location: "",
     resume_file: "",
     resume_name: "",
     application_status: "",
@@ -121,6 +122,7 @@ const showInfoModal = (data) => {
     form.contact_number = data.contact_number;
     form.job_id = data.job_id;
     form.job_title = data.title;
+    form.location = data.location;
     form.resume_name = data.file_name;
     form.resume_file = data.file_path;
     form.application_status = data.status;
@@ -311,6 +313,13 @@ watch(
                                     scope="col"
                                     class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
                                 >
+                                    Location
+                                </th>
+
+                                <th
+                                    scope="col"
+                                    class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
+                                >
                                     Application Status
                                 </th>
 
@@ -412,6 +421,16 @@ watch(
                                         class="text-base text-gray-900 dark:text-white"
                                     >
                                         {{ role.title }}
+                                    </div>
+                                </td>
+
+                                <td
+                                    class="max-w-sm px-2 py-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400"
+                                >
+                                    <div
+                                        class="text-base text-gray-900 dark:text-white"
+                                    >
+                                        {{ role.location }}
                                     </div>
                                 </td>
 
@@ -648,6 +667,17 @@ watch(
                     </h3>
                     <p class="text-black dark:text-white">
                         {{ form.job_title }}
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-md text-gray-500 dark:text-gray-400">
+                        <span class="font-bold text-black dark:text-gray-400"
+                            >Location:
+                        </span>
+                    </h3>
+                    <p class="text-black dark:text-white">
+                        {{ form.location }}
                     </p>
                 </div>
 
