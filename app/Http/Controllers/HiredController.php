@@ -7,6 +7,7 @@ use App\Models\Application;
 use App\Models\HrManager;
 use App\Models\HrStaff;
 use App\Models\User;
+use App\Models\Applicant;
 use App\Models\JobPosition;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
@@ -181,6 +182,19 @@ class HiredController extends Controller
     public function edit(Application $application)
     {
         //
+    }
+
+    public function resign($id)
+    {
+        $resign = Application::findOrFail($id);
+
+        $applicantUser = Applicant::findOrFail($resign->applicant_id);
+
+        $jobPosition = JobPosition::findOrFail($resign->job_position_id);
+
+        $resign->status = 6;
+
+        $resign->save();
     }
 
     /**
