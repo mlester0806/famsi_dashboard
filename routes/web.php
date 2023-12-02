@@ -12,6 +12,7 @@ use App\Http\Controllers\DisqualifiedController;
 use App\Http\Controllers\DocumentsController;
 use App\Http\Controllers\EmployeeTypeController;
 use App\Http\Controllers\HiredController;
+use App\Http\Controllers\ResignedController;
 use App\Http\Controllers\HrStaffDashboardController;
 use App\Http\Controllers\HrManagerDashboardController;
 use App\Http\Controllers\IndustryController;
@@ -154,7 +155,15 @@ Route::middleware([
         Route::group(['prefix' => 'hired', 'as' => 'hired.'], function() {
             Route::get('/', [HiredController::class, 'index'])->name('index');
 
+            Route::put('/resign/{id}', [HiredController::class, 'resign'])->name('resign');
+
             Route::put('/update/{id}', [HiredController::class, 'update'])->name('update');
+        });
+
+        Route::group(['prefix' => 'resigned', 'as' => 'resigned.'], function() {
+            Route::get('/', [ResignedController::class, 'index'])->name('index');
+
+            Route::put('/update/{id}', [ResignedController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'documents', 'as' => 'documents.'], function() {
@@ -269,8 +278,16 @@ Route::middleware([
 
         Route::group(['prefix' => 'hired', 'as' => 'hired.'], function() {
             Route::get('/', [HiredController::class, 'index'])->name('index');
+            
+            Route::put('/resign/{id}', [HiredController::class, 'resign'])->name('resign');
 
             Route::put('/update/{id}', [HiredController::class, 'update'])->name('update');
+        });
+
+        Route::group(['prefix' => 'resigned', 'as' => 'resigned.'], function() {
+            Route::get('/', [ResignedController::class, 'index'])->name('index');
+
+            Route::put('/update/{id}', [ResignedController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'documents', 'as' => 'documents.'], function() {
