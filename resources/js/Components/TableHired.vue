@@ -16,8 +16,6 @@ const props = defineProps({
     jobPositions: Array,
 });
 
-    console.log(props.jobPositions);
-
 const form = useForm({
     first_name: "",
     middle_name: "",
@@ -27,6 +25,7 @@ const form = useForm({
     contact_number: "",
     job_id: "",
     job_title: "",
+    location: "",
     resume_file: "",
     resume_name: "",
     application_status: "",
@@ -46,6 +45,7 @@ let updateModalVisibility = ref(false);
 let currentUpdatingUserID = ref(null);
 let viewInfoModalVisibility = ref(false);
 let hireModalVisibility = ref(false);
+let resignModalVisibility = ref(false);
 let disapproveModalVisibility = ref(false);
 
 const hireApplicant = () => {
@@ -63,13 +63,13 @@ const hireApplicant = () => {
     );
 };
 
-const disapprove = () => {
+const resign = () => {
     form.put(
-        `/${page.props.user.role}/${props.linkName}/disapprove/${currentUpdatingUserID.value}`,
+        `/${page.props.user.role}/${props.linkName}/resign/${currentUpdatingUserID.value}`,
         {
             onSuccess: () => {
-                toast.success("Application disapproved successfully!");
-                hideDisapproveModal();
+                toast.success("Application resigned successfully!");
+                hideResignModal();
                 form.reset();
                 clearErrors();
             },
@@ -107,6 +107,7 @@ const showUpdateModal = (data) => {
         form.contact_number = data.contact_number;
         form.job_id = data.job_id;
         form.job_title = data.title;
+        form.location = data.location;
         form.resume_name = data.file_name;
         form.resume_file = data.file_path;
         form.application_status = data.status;
@@ -132,8 +133,8 @@ const hideUpdateModal = () => {
     form.clearErrors();
 };
 
-// Disapprove Modal
-const showDisapproveModal = (id) => {
+// Resign Modal
+const showResignModal = (id) => {
     document.body.classList.remove("overflow-hidden");
     viewInfoModalVisibility.value = false;
 
@@ -141,16 +142,16 @@ const showDisapproveModal = (id) => {
 
     currentUpdatingUserID.value = id;
 
-    disapproveModalVisibility.value = true;
+    resignModalVisibility.value = true;
 };
 
-const hideDisapproveModal = () => {
+const hideResignModal = () => {
     document.body.classList.remove("overflow-hidden");
 
     currentUpdatingUserID.value = null;
 
     viewInfoModalVisibility.value = false;
-    disapproveModalVisibility.value = false;
+    resignModalVisibility.value = false;
 };
 
 // Hire Modal
@@ -184,6 +185,7 @@ const showInfoModal = (data) => {
     form.contact_number = data.contact_number;
     form.job_id = data.job_id;
     form.job_title = data.title;
+    form.location = data.location;
     form.resume_name = data.file_name;
     form.resume_file = data.file_path;
     form.application_status = data.status;
@@ -232,6 +234,12 @@ watch(
             <div
                 v-if="disapproveModalVisibility"
                 @click="hideDisapproveModal"
+                class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-30 transition duration-200"
+            ></div>
+
+            <div
+                v-else-if="resignModalVisibility"
+                @click="hideResignModal"
                 class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-30 transition duration-200"
             ></div>
 
@@ -380,6 +388,13 @@ watch(
                                     scope="col"
                                     class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
                                 >
+                                    Location
+                                </th>
+
+                                <th
+                                    scope="col"
+                                    class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
+                                >
                                     Application Status
                                 </th>
 
@@ -485,6 +500,16 @@ watch(
                                 </td>
 
                                 <td
+                                    class="max-w-sm px-2 py-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400"
+                                >
+                                    <div
+                                        class="text-base text-gray-900 dark:text-white"
+                                    >
+                                        {{ role.location }}
+                                    </div>
+                                </td>
+
+                                <td
                                     class="px-2 py-4 text-base font-normal text-gray-900 whitespace-nowrap dark:text-white"
                                 >
                                 <div
@@ -548,6 +573,17 @@ watch(
                                 <td
                                     class="px-2 py-4 space-x-2 whitespace-nowrap"
                                 >
+                                <button
+                                        type="button"
+                                        id="updateProductButton"
+                                        @click="
+                                            showResignModal(roles.id)
+                                        "
+                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+                                    >
+                                        Resign
+                                    </button>
+
                                     <button
                                         type="button"
                                         id="updateProductButton"
@@ -563,7 +599,7 @@ watch(
 
                             <tr v-if="roles.data.length === 0">
                                 <td
-                                    colspan="10"
+                                    colspan="9"
                                     class="max-w-sm text-center p-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400"
                                 >
                                     <div
@@ -716,6 +752,17 @@ watch(
                 <div>
                     <h3 class="text-md text-gray-500 dark:text-gray-400">
                         <span class="font-bold text-black dark:text-gray-400"
+                            >Location:
+                        </span>
+                    </h3>
+                    <p class="text-black dark:text-white">
+                        {{ form.location }}
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-md text-gray-500 dark:text-gray-400">
+                        <span class="font-bold text-black dark:text-gray-400"
                             >Resume File Name:
                         </span>
                     </h3>
@@ -743,13 +790,102 @@ watch(
 
                 <div class="flex justify-center w-full pt-4 space-x-4">
                     <button
+                    @click="showResignModal(currentUpdatingUserID)"
+                    type="button"
+                    id="deleteJobsButton"
+                    class="inline-flex w-full justify-center text-white items-center bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 rounded-lg text-sm font-medium px-5 py-2.5 focus:z-10 dark:bg-red-700 dark:hover:bg-red-900 dark:focus:ring-red-900"
+                >
+                    Resign
+                </button>
+
+                    <button
                         @click="showUpdateModal(form)"
                         class="text-white w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:bg-blue-200 dark:disabled:bg-blue-900"
                     >
                         Update
                     </button>
+
+
                 </div>
             </div>
+        </div>
+    </Transition>
+
+        <!-- Resign Product Drawer -->
+        <Transition
+        enter-from-class="translate-x-full"
+        enter-active-class="transition-transform translate-x-0"
+        leave-active-class="transition-transform translate-x-0"
+        leave-to-class="translate-x-full"
+    >
+        <div
+            v-if="resignModalVisibility"
+            id="drawer-delete-product-default"
+            class="fixed top-0 right-0 z-40 w-full h-screen max-w-xs p-4 overflow-y-auto bg-white dark:bg-gray-800"
+            tabindex="-1"
+            aria-labelledby="drawer-label"
+            aria-hidden="true"
+        >
+            <h5
+                id="drawer-label"
+                class="inline-flex items-center text-sm font-semibold text-gray-500 uppercase dark:text-gray-400"
+            >
+                Resign
+            </h5>
+            <button
+                @click="hideResignModal"
+                type="button"
+                aria-controls="drawer-delete-product-default"
+                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
+            >
+                <svg
+                    aria-hidden="true"
+                    class="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                    ></path>
+                </svg>
+                <span class="sr-only">Close menu</span>
+            </button>
+            <svg
+                class="w-10 h-10 mt-8 mb-4 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                ></path>
+            </svg>
+            <h3 class="mb-6 text-lg text-gray-500 dark:text-gray-400">
+                Are you sure you want to resign this {{ title }}?
+            </h3>
+
+            <form @submit.prevent="resign" class="inline-block">
+                <button
+                    type="submit"
+                    class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-red-900"
+                >
+                    Yes, I'm sure
+                </button>
+            </form>
+            <button
+                @click="hideResignModal"
+                class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 border border-gray-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+                data-modal-toggle="delete-product-modal"
+            >
+                No, cancel
+            </button>
         </div>
     </Transition>
 
@@ -809,7 +945,7 @@ watch(
 
                             <option
                                 v-for="job in props.jobPositions.filter(
-                                    (job) => job.is_active
+                                    (job) => job.is_active === 1
                                 )"
                                 :key="job.id"
                                 :value="job.id"
