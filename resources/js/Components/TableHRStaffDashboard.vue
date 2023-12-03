@@ -572,11 +572,11 @@ const calendarOptions = ref({
                             <option value="" disabled selected hidden></option>
                             <option
                                 v-for="applicant in applicants"
-                                :key="applicant.id"
-                                :value="applicant.id"
+                                :key="applicant.applicant.id"
+                                :value="applicant.applicant.id"
                             >
-                                {{ applicant.first_name }}
-                                {{ applicant.last_name }}
+                                {{ applicant.applicant.first_name }}
+                                {{ applicant.applicant.last_name }}
                             </option>
                         </SelectInput>
                     </div>
@@ -880,11 +880,11 @@ const calendarOptions = ref({
                             <option value="" disabled selected hidden></option>
                             <option
                                 v-for="applicant in applicants"
-                                :key="applicant.id"
-                                :value="applicant.id"
+                                :key="applicant.applicant.id"
+                                :value="applicant.applicant.id"
                             >
-                                {{ applicant.first_name }}
-                                {{ applicant.last_name }}
+                                {{ applicant.applicant.first_name }}
+                                {{ applicant.applicant.last_name }}
                             </option>
                         </SelectInput>
                     </div>
