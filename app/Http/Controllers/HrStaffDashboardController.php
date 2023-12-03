@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin;
 use App\Models\Applicant;
+use App\Models\Application;
 use App\Models\Appointment;
 use App\Models\HrManager;
 use App\Models\HrStaff;
@@ -23,8 +24,8 @@ class HrStaffDashboardController extends Controller
     {
         $events = [];
         $authUser = HrStaff::where('user_id', auth()->user()->id)->first();
-        $applicants = Applicant::all();
-
+        $applicants = Application::where('status', 2)
+        ->with(['applicant'])->get();
         $appointments = Appointment::with(['applicant', 'hrStaff'])
         ->where('interviewer_id', $authUser->id)
         ->get();
@@ -59,8 +60,7 @@ class HrStaffDashboardController extends Controller
             'endTimeDate.different' => 'The end time must be different from the start time.',
         ]);
 
-
-        $authUser = HrManager::where('user_id', auth()->user()->id)->first();
+        $authUser = HrStaff::where('user_id', auth()->user()->id)->first();
 
         $startDateTime = Carbon::createFromFormat('Y-m-d\TH:i:sP', $scheduleValidate['startTimeDate']);
         $endDateTime = Carbon::createFromFormat('Y-m-d\TH:i:sP', $scheduleValidate['endTimeDate']);
