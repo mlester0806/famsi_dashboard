@@ -570,7 +570,7 @@ watch(
 
                             <tr v-if="roles.data.length === 0">
                                 <td
-                                    colspan="11"
+                                    colspan="10"
                                     class="max-w-sm text-center p-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400"
                                 >
                                     <div
