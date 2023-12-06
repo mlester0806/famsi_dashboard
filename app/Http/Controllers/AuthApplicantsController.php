@@ -11,7 +11,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Notifications\ApplicantVerifyEmailAddress;
+use App\Notifications\ApplicantForgotPassword;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Http;
 
 class AuthApplicantsController extends Controller
 {
@@ -73,6 +76,7 @@ class AuthApplicantsController extends Controller
     $validator = Validator::make($request->all(), [
         'email' => 'required|email',
         'password' => 'required|string',
+        'captcha_token' => 'required|string',
     ]);
 
     if ($validator->fails()) {
@@ -85,8 +89,28 @@ class AuthApplicantsController extends Controller
         $user = Auth::user();
 
         if ($user->user_type === 0 && $user->email_verified_at) {
-            $token = $user->createToken('Applicant Dashboard')->plainTextToken;
-            return response()->json(['token' => $token], 200);
+            // Get the reCAPTCHA token from the request
+            $recaptchaToken = $request->input('captcha_token');
+
+            // Verify the reCAPTCHA token
+            $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+                'secret'   => env('RECAPTCHA_SECRET_KEY'),
+                'response' => $recaptchaToken,
+            ]);
+
+            // Decode the response JSON
+            $data = json_decode($response->body());
+
+            // Check if the reCAPTCHA verification was successful
+            if ($data->success) {
+                // reCAPTCHA verification successful
+                $token = $user->createToken('Applicant Dashboard')->plainTextToken;
+
+                return response()->json(['token' => $token], 200);
+            } else {
+                // reCAPTCHA verification failed
+                return response()->json(['success' => false, 'message' => 'reCAPTCHA verification failed'], 422);
+            }
         } else if ($user->user_type === 0 && !$user->email_verified_at) {
             return response()->json(['error' => 'You need to verify your email first.', 'title' => "Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.", 'message' => "Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another."], 401);
         } else {
@@ -126,6 +150,66 @@ class AuthApplicantsController extends Controller
         }
     }
 
+    // Verify Forgot Password
+    public function verifyForgotPass(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $userVerifyingEmail = User::where('email', $request->input('email'))->first();
+
+            // Check if the user with the provided email exists
+        if ($userVerifyingEmail && $userVerifyingEmail->user_type === 0) {
+        // Check if the user has already verified their email
+        if (!$userVerifyingEmail->hasVerifiedEmail()) {    
+            return response()->json(['message' => 'The email the you provided is not yet verified.'], 404);
+        } else {
+            $token = Str::random(64);
+            // Send the custom verification email
+            $userVerifyingEmail->notify(new ApplicantForgotPassword($token));
+
+            return response()->json(['message' => 'A password reset link has been sent to your email address.']);
+        }
+        } else {
+            return response()->json(['message' => 'User not found with the provided email.'], 404);
+        }
+    }
+
+    public function resetPass(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'newPass' => 'required|min:8',
+            'confirmNewPass' => 'required|same:newPass|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
+        $userVerifyingEmail = User::where('email', $request->input('email'))->first();
+
+            // Check if the user with the provided email exists
+        if ($userVerifyingEmail && $userVerifyingEmail->user_type === 0) {
+            // Update the user's password
+            $newPassword = $request->input('newPass');
+            $hashedPassword = Hash::make($newPassword);
+
+            $userVerifyingEmail->update([
+                'password' => $hashedPassword,
+            ]);
+
+            return response()->json(['message' => 'Password updated successfully.'], 200);
+        } else {
+            return response()->json(['message' => 'The provided email cannot be found.'], 404);
+        }
+    }
+
     public function checkEmailVerification(Request $request)
     {
         $data = $request->all();
@@ -154,6 +238,18 @@ class AuthApplicantsController extends Controller
         } else {
             // Link has expired
             return response()->json(['message' => 'Email verification link has expired.'], 403);
+        }
+    }
+
+    public function forgotPasswordVerification(Request $request)
+    {
+        $data = $request->all();
+
+        $user = User::where('id', $data['id'])->first();
+
+        // Check if the user exists
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
         }
     }
 
