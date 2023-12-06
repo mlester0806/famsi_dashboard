@@ -34,6 +34,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('login', [AuthApplicantsController::class, 'login']);
 Route::post('register', [AuthApplicantsController::class, 'register']);
 Route::post('verify-email', [AuthApplicantsController::class, 'verifyEmail']);
+Route::post('verify-forgot-pass', [AuthApplicantsController::class, 'verifyForgotPass']);
+Route::patch('reset-pass', [AuthApplicantsController::class, 'resetPass']);
 Route::post('check-email-verification', [AuthApplicantsController::class, 'checkEmailVerification']);
 Route::post('logout', [AuthApplicantsController::class, 'logout']);
 Route::post('refresh', [AuthApplicantsController::class, 'refresh']);
