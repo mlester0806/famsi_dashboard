@@ -38,6 +38,8 @@ const page = usePage();
 const toast = useToast();
 
 let search = ref(props.filters.search);
+let filterStatus = ref(props.filters.filterStatus);
+let alreadyApplied = ref(props.filters.application);
 
 let currentUpdatingUserID = ref(null);
 let currentUserIsActive = ref(null);
@@ -255,6 +257,58 @@ watch(
         if (value) {
             query.search = value;
         }
+        if(filterStatus.value) {
+            query.status = filterStatus.value;
+        }
+        if(alreadyApplied.value) {
+            query.application = alreadyApplied.value;
+        }
+
+        router.get(`/${page.props.user.role}/${props.linkName}`, query, {
+            preserveState: true,
+            replace: true,
+        });
+    }, 500)
+);
+
+watch(
+    filterStatus,
+    debounce((value) => {
+        const query = {};
+        if (value) {
+            query.status = value;
+        }
+
+        if (search.value) {
+            query.search = search.value;
+        }
+
+        if(alreadyApplied.value) {
+            query.application = alreadyApplied.value;
+        }
+
+        router.get(`/${page.props.user.role}/${props.linkName}`, query, {
+            preserveState: true,
+            replace: true,
+        });
+    }, 500)
+);
+
+watch(
+    alreadyApplied,
+    debounce((value) => {
+        const query = {};
+        if (value) {
+            query.application = value;
+        }
+
+        if (search.value) {
+            query.search = search.value;
+        }
+
+        if (filterStatus.value) {
+            query.status = filterStatus.value;
+        }
 
         router.get(`/${page.props.user.role}/${props.linkName}`, query, {
             preserveState: true,
@@ -358,6 +412,94 @@ watch(
                             label="Search"
                             placeholder="Search"
                         />
+                    </div>
+                </div>
+                <div class="flex items-center mb-4 sm:mb-0">
+                    <div class="relative w-48 sm:w-64">
+                        <SelectInput
+                            id="alreadyApplied"
+                            v-model="alreadyApplied"
+                            label="Select Application"
+                            :canSearch="false"
+                        >
+                            <option value="" disabled selected hidden></option>
+
+                            <option
+                                value="All"
+                                :selected="filterStatus !== 'Not Yet Applied' || filterStatus !== 'Already Applied'"
+                            >
+                                All
+                            </option>
+                            <option
+                                value="Not Yet Applied"
+                                :selected="filterStatus === 'Not Yet Applied'"
+                            >
+                                Not Yet Applied
+                            </option>
+                            <option
+                                value="Already Applied"
+                                :selected="filterStatus === 'Already Applied'"
+                            >
+                                Already Applied
+                            </option>
+
+                        </SelectInput>
+                    </div>
+                </div>
+                <div class="flex items-center mb-4 sm:mb-0">
+                    <div class="relative w-48 sm:w-64">
+                        <SelectInput
+                            id="filterStatus"
+                            v-model="filterStatus"
+                            label="Select Status"
+                            :canSearch="false"
+                        >
+                            <option value="" disabled selected hidden></option>
+
+                            <option
+                                value="All"
+                                :selected="filterStatus !== 'Pending' || filterStatus !== 'For Interview' || filterStatus !== 'In Progress' || filterStatus !== 'Qualified' || filterStatus !== 'Disqualified' || filterStatus !== 'Hired'"
+                            >
+                                All
+                            </option>
+
+                            <option
+                                value="Pending"
+                                :selected="filterStatus === 'Pending'"
+                            >
+                                Pending
+                            </option>
+                            <option
+                                value="For Interview"
+                                :selected="filterStatus === 'For Interview'"
+                            >
+                                For Interview
+                            </option>
+                            <option
+                                value="In Progress"
+                                :selected="filterStatus === 'In Progress'"
+                            >
+                                In Progress
+                            </option>
+                            <option
+                                value="Qualified"
+                                :selected="filterStatus === 'Qualified'"
+                            >
+                                Qualified
+                            </option>
+                            <option
+                                value="Disqualified"
+                                :selected="filterStatus === 'Disqualified'"
+                            >
+                                Disqualified
+                            </option>
+                            <option
+                                value="Hired"
+                                :selected="filterStatus === 'Hired'"
+                            >
+                                Hired
+                            </option>
+                        </SelectInput>
                     </div>
                 </div>
                 <button

@@ -1,6 +1,6 @@
 <script setup>
 import { router, usePage, useForm } from "@inertiajs/vue3";
-import { ref, watch, Transition, Teleport, reactive } from "vue";
+import { ref, watch, Transition, Teleport } from "vue";
 import debounce from "lodash.debounce";
 import { useToast } from "vue-toastification";
 import Pagination from "../Partials/Table/Pagination.vue";
@@ -22,15 +22,12 @@ const form = useForm({
     gender: "",
     email: "",
     contact_number: "",
-});
-
-const addModalForm = reactive({
-    first_name: "",
-    middle_name: "",
-    last_name: "",
-    gender: "",
-    email: "",
-    contact_number: "",
+    job_id: "",
+    job_title: "",
+    location: "",
+    resume_file: "",
+    resume_name: "",
+    application_status: "",
 });
 
 const page = usePage();
@@ -38,38 +35,21 @@ const page = usePage();
 const toast = useToast();
 
 let search = ref(props.filters.search);
+let filterStatus = ref(props.filters.filterStatus);
 
 let currentUpdatingUserID = ref(null);
-let currentUserIsActive = ref(null);
-let currentUserEmailIsVerified = ref(null);
-
-let updateModalVisibility = ref(false);
-let addModalVisibility = ref(false);
 let viewInfoModalVisibility = ref(false);
-let activationModalVisibility = ref(false);
-let deactivationModalVisibility = ref(false);
+let approveModalVisibility = ref(false);
+let disapproveModalVisibility = ref(false);
 
-const submit = () => {
-    form.post(`/${page.props.user.role}/${props.linkName}/store`, {
-        onSuccess: () => {
-            toast.success("User created successfully!");
-            document.body.classList.remove("overflow-hidden");
-            updateModalVisibility.value = false;
-            addModalVisibility.value = false;
-            form.reset();
-            clearErrors();
-        },
-    });
-};
-
-const update = () => {
+const approve = () => {
     form.put(
-        `/${page.props.user.role}/${props.linkName}/update/${currentUpdatingUserID.value}`,
+        `/${page.props.user.role}/${props.linkName}/approve/${currentUpdatingUserID.value}`,
         {
             onSuccess: () => {
-                toast.success("User updated successfully!");
-                hideUpdateModal();
-                hideAddModal();
+                toast.success("Application approved successfully!");
+                hideApproveModal();
+                hideDisapproveModal();
                 form.reset();
                 clearErrors();
             },
@@ -77,16 +57,14 @@ const update = () => {
     );
 };
 
-const activate = () => {
+const disapprove = () => {
     form.put(
-        `/${page.props.user.role}/${props.linkName}/activate/${currentUpdatingUserID.value}`,
+        `/${page.props.user.role}/${props.linkName}/disapprove/${currentUpdatingUserID.value}`,
         {
             onSuccess: () => {
-                toast.success("User activated successfully!");
-                hideUpdateModal();
-                hideAddModal();
-                hideActivationModal();
-                hideDeactivationModal();
+                toast.success("Application disapproved successfully!");
+                hideApproveModal();
+                hideDisapproveModal();
                 form.reset();
                 clearErrors();
             },
@@ -94,25 +72,8 @@ const activate = () => {
     );
 };
 
-const deactivate = () => {
-    form.put(
-        `/${page.props.user.role}/${props.linkName}/deactivate/${currentUpdatingUserID.value}`,
-        {
-            onSuccess: () => {
-                toast.success("User deactivated successfully!");
-                hideUpdateModal();
-                hideAddModal();
-                hideActivationModal();
-                hideDeactivationModal();
-                form.reset();
-                clearErrors();
-            },
-        }
-    );
-};
-
-// Activation Modal
-const showActivationModal = (id) => {
+// Approve Modal
+const showApproveModal = (id) => {
     document.body.classList.remove("overflow-hidden");
     viewInfoModalVisibility.value = false;
 
@@ -120,20 +81,20 @@ const showActivationModal = (id) => {
 
     currentUpdatingUserID.value = id;
 
-    activationModalVisibility.value = true;
+    approveModalVisibility.value = true;
 };
 
-const hideActivationModal = () => {
+const hideApproveModal = () => {
     document.body.classList.remove("overflow-hidden");
 
     currentUpdatingUserID.value = null;
 
     viewInfoModalVisibility.value = false;
-    activationModalVisibility.value = false;
+    approveModalVisibility.value = false;
 };
 
-// Deactivation Modal
-const showDeactivationModal = (id) => {
+// Disapprove Modal
+const showDisapproveModal = (id) => {
     document.body.classList.remove("overflow-hidden");
     viewInfoModalVisibility.value = false;
 
@@ -141,16 +102,16 @@ const showDeactivationModal = (id) => {
 
     currentUpdatingUserID.value = id;
 
-    deactivationModalVisibility.value = true;
+    disapproveModalVisibility.value = true;
 };
 
-const hideDeactivationModal = () => {
+const hideDisapproveModal = () => {
     document.body.classList.remove("overflow-hidden");
 
     currentUpdatingUserID.value = null;
 
     viewInfoModalVisibility.value = false;
-    deactivationModalVisibility.value = false;
+    disapproveModalVisibility.value = false;
 };
 
 // Show Info Modal
@@ -161,12 +122,16 @@ const showInfoModal = (data) => {
     form.gender = data.gender;
     form.email = data.email;
     form.contact_number = data.contact_number;
+    form.job_id = data.job_id;
+    form.job_title = data.title;
+    form.location = data.location;
+    form.resume_name = data.file_name;
+    form.resume_file = data.file_path;
+    form.application_status = data.status;
 
     document.body.classList.add("overflow-hidden");
 
     currentUpdatingUserID.value = data.id;
-    currentUserIsActive.value = data.is_active;
-    currentUserEmailIsVerified.value = data.email_verified_at;
 
     viewInfoModalVisibility.value = true;
 };
@@ -175,76 +140,11 @@ const hideInfoModal = () => {
     document.body.classList.remove("overflow-hidden");
 
     currentUpdatingUserID.value = null;
-    currentUserIsActive.value = null;
-    currentUserEmailIsVerified.value = null;
 
     viewInfoModalVisibility.value = false;
 
     form.reset();
 
-    form.clearErrors();
-};
-
-// Update Modal
-const showUpdateModal = (data) => {
-    document.body.classList.remove("overflow-hidden");
-    viewInfoModalVisibility.value = false;
-
-    if (data) {
-        form.first_name = data.first_name;
-        form.middle_name = data.middle_name;
-        form.last_name = data.last_name;
-        form.gender = data.gender;
-        form.email = data.email;
-        form.contact_number = data.contact_number;
-
-        if (!currentUpdatingUserID.value) currentUpdatingUserID.value = data.id;
-    }
-
-    document.body.classList.add("overflow-hidden");
-
-    updateModalVisibility.value = true;
-};
-
-const hideUpdateModal = () => {
-    document.body.classList.remove("overflow-hidden");
-
-    currentUpdatingUserID.value = null;
-
-    viewInfoModalVisibility.value = false;
-    updateModalVisibility.value = false;
-
-    form.reset();
-
-    form.clearErrors();
-};
-
-const showAddModal = () => {
-    form.first_name = addModalForm.first_name;
-    form.middle_name = addModalForm.middle_name;
-    form.last_name = addModalForm.last_name;
-    form.gender = addModalForm.gender;
-    form.email = addModalForm.email;
-    form.contact_number = addModalForm.contact_number;
-
-    document.body.classList.add("overflow-hidden");
-
-    addModalVisibility.value = true;
-};
-
-const hideAddModal = () => {
-    document.body.classList.remove("overflow-hidden");
-
-    addModalVisibility.value = false;
-
-    addModalForm.first_name = form.first_name;
-    addModalForm.middle_name = form.middle_name;
-    addModalForm.last_name = form.last_name;
-    addModalForm.gender = form.gender;
-    addModalForm.email = form.email;
-    addModalForm.contact_number = form.contact_number;
-
-    form.reset();
     form.clearErrors();
 };
 
@@ -254,6 +154,28 @@ watch(
         const query = {};
         if (value) {
             query.search = value;
+        }
+        if(filterStatus.value) {
+            query.status = filterStatus.value;
+        }
+
+        router.get(`/${page.props.user.role}/${props.linkName}`, query, {
+            preserveState: true,
+            replace: true,
+        });
+    }, 500)
+);
+
+watch(
+    filterStatus,
+    debounce((value) => {
+        const query = {};
+        if (value) {
+            query.status = value;
+        }
+
+        if (search.value) {
+            query.search = search.value;
         }
 
         router.get(`/${page.props.user.role}/${props.linkName}`, query, {
@@ -271,26 +193,14 @@ watch(
     >
         <Teleport to="body">
             <div
-                v-if="updateModalVisibility"
-                @click="hideUpdateModal"
+                v-if="approveModalVisibility"
+                @click="hideApproveModal"
                 class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-30 transition duration-200"
             ></div>
 
             <div
-                v-else-if="addModalVisibility"
-                @click="hideAddModal"
-                class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-30 transition duration-200"
-            ></div>
-
-            <div
-                v-else-if="activationModalVisibility"
-                @click="hideActivationModal"
-                class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-30 transition duration-200"
-            ></div>
-
-            <div
-                v-else-if="deactivationModalVisibility"
-                @click="hideDeactivationModal"
+                v-else-if="disapproveModalVisibility"
+                @click="hideDisapproveModal"
                 class="bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-30 transition duration-200"
             ></div>
 
@@ -360,19 +270,63 @@ watch(
                         />
                     </div>
                 </div>
-                <button
-                    v-if="page.props.user.role !== 'hr-manager'"
-                    id="addNewButton"
-                    @click="showAddModal"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-                    type="button"
-                >
-                    <font-awesome-icon
-                        class="mr-2 -ml-1"
-                        :icon="['fas', 'plus']"
-                    />
-                    Add new {{ title }}
-                </button>
+
+                <div class="flex items-center mb-4 sm:mb-0">
+                    <div class="relative w-48 mt-1 sm:w-64 xl:w-96">
+                        <SelectInput
+                            id="status"
+                            v-model="filterStatus"
+                            label="Select Status"
+                            :canSearch="false"
+                        >
+                            <option value="" disabled selected hidden></option>
+
+                            <option
+                                value=""
+                                :selected="filterStatus !== 'Pending' || filterStatus !== 'For Interview' || filterStatus !== 'In Progress' || filterStatus !== 'Qualified' || filterStatus !== 'Disqualified' || filterStatus !== 'Hired'"
+                            >
+                                All
+                            </option>
+
+                            <option
+                                value="Pending"
+                                :selected="filterStatus === 'Pending'"
+                            >
+                                Pending
+                            </option>
+                            <option
+                                value="For Interview"
+                                :selected="filterStatus === 'For Interview'"
+                            >
+                                For Interview
+                            </option>
+                            <option
+                                value="In Progress"
+                                :selected="filterStatus === 'In Progress'"
+                            >
+                                In Progress
+                            </option>
+                            <option
+                                value="Qualified"
+                                :selected="filterStatus === 'Qualified'"
+                            >
+                                Qualified
+                            </option>
+                            <option
+                                value="Disqualified"
+                                :selected="filterStatus === 'Disqualified'"
+                            >
+                                Disqualified
+                            </option>
+                            <option
+                                value="Hired"
+                                :selected="filterStatus === 'Hired'"
+                            >
+                                Hired
+                            </option>
+                        </SelectInput>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -421,26 +375,41 @@ watch(
                                 >
                                     Contact Number
                                 </th>
+
                                 <th
                                     scope="col"
                                     class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
                                 >
-                                    Email Status
+                                    Job ID
                                 </th>
 
                                 <th
                                     scope="col"
                                     class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
                                 >
-                                    Account Status
+                                    Job Title
                                 </th>
 
                                 <th
+                                    scope="col"
+                                    class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
+                                >
+                                    Location
+                                </th>
+
+                                <th
+                                    scope="col"
+                                    class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
+                                >
+                                    Application Status
+                                </th>
+
+                                <!-- <th
                                     scope="col"
                                     class="px-2 py-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400"
                                 >
                                     Actions
-                                </th>
+                                </th> -->
                             </tr>
                         </thead>
                         <tbody
@@ -517,23 +486,32 @@ watch(
                                 </td>
 
                                 <td
-                                    class="px-2 py-4 text-base font-normal text-gray-900 whitespace-nowrap dark:text-white"
+                                    class="max-w-sm px-2 py-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400"
                                 >
                                     <div
-                                        v-if="role.email_verified_at"
-                                        class="flex items-center"
+                                        class="text-base text-gray-900 dark:text-white"
                                     >
-                                        <div
-                                            class="h-2.5 w-2.5 rounded-full bg-green-400 mr-2"
-                                        ></div>
-                                        Verified
+                                        {{ role.job_id }}
                                     </div>
+                                </td>
 
-                                    <div v-else class="flex items-center">
-                                        <div
-                                            class="h-2.5 w-2.5 rounded-full bg-red-500 mr-2"
-                                        ></div>
-                                        Not Verified
+                                <td
+                                    class="max-w-sm px-2 py-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400"
+                                >
+                                    <div
+                                        class="text-base text-gray-900 dark:text-white"
+                                    >
+                                        {{ role.title }}
+                                    </div>
+                                </td>
+
+                                <td
+                                    class="max-w-sm px-2 py-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400"
+                                >
+                                    <div
+                                        class="text-base text-gray-900 dark:text-white"
+                                    >
+                                        {{ role.location }}
                                     </div>
                                 </td>
 
@@ -541,61 +519,89 @@ watch(
                                     class="px-2 py-4 text-base font-normal text-gray-900 whitespace-nowrap dark:text-white"
                                 >
                                     <div
-                                        v-if="role.is_active"
+                                        v-if="role.status === 1"
+                                        class="flex items-center"
+                                    >
+                                        <div
+                                            class="h-2.5 w-2.5 rounded-full bg-gray-400 mr-2"
+                                        ></div>
+                                        Pending
+                                    </div>
+
+                                    <div
+                                        v-else-if="role.status === 2"
+                                        class="flex items-center"
+                                    >
+                                        <div
+                                            class="h-2.5 w-2.5 rounded-full bg-yellow-400 mr-2"
+                                        ></div>
+                                        For Interview
+                                    </div>
+
+                                    <div
+                                        v-else-if="role.status === 3"
+                                        class="flex items-center"
+                                    >
+                                        <div
+                                            class="h-2.5 w-2.5 rounded-full bg-orange-400 mr-2"
+                                        ></div>
+                                        In Progress
+                                    </div>
+
+                                    <div
+                                        v-else-if="role.status === 4"
+                                        class="flex items-center"
+                                    >
+                                        <div
+                                            class="h-2.5 w-2.5 rounded-full bg-blue-400 mr-2"
+                                        ></div>
+                                        Qualified
+                                    </div>
+
+                                    <div
+                                        v-else-if="role.status === 5"
                                         class="flex items-center"
                                     >
                                         <div
                                             class="h-2.5 w-2.5 rounded-full bg-green-400 mr-2"
                                         ></div>
-                                        Active
+                                        Hired
                                     </div>
 
                                     <div v-else class="flex items-center">
                                         <div
                                             class="h-2.5 w-2.5 rounded-full bg-red-500 mr-2"
                                         ></div>
-                                        Inactive
+                                        Not Qualified
                                     </div>
                                 </td>
 
-                                <td
+                                <!-- <td
                                     class="px-2 py-4 space-x-2 whitespace-nowrap"
                                 >
                                     <button
+                                        @click="showDisapproveModal(role.id)"
                                         type="button"
-                                        id="updateProductButton"
-                                        @click="
-                                            showUpdateModal(roles.data[index])
-                                        "
-                                        class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                                    >
-                                        Update
-                                    </button>
-                                    <button
-                                        v-if="role.is_active"
-                                        @click="showDeactivationModal(role.id)"
-                                        type="button"
-                                        id="deactivateUserButton"
+                                        id="disapproveUserButton"
                                         class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-700 rounded-lg hover:bg-red-800 focus:ring-4 focus:ring-red-300 dark:focus:ring-red-900"
                                     >
-                                        Deactivate
+                                        Disapprove
                                     </button>
 
                                     <button
-                                        v-else
-                                        @click="showActivationModal(role.id)"
+                                        @click="showApproveModal(role.id)"
                                         type="button"
-                                        id="activateUserButton"
+                                        id="approveUserButton"
                                         class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-green-700 rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-green-300 dark:focus:ring-green-900"
                                     >
-                                        Activate
+                                        Approve
                                     </button>
-                                </td>
+                                </td> -->
                             </tr>
 
                             <tr v-if="roles.data.length === 0">
                                 <td
-                                    colspan="9"
+                                    colspan="11"
                                     class="max-w-sm text-center p-4 overflow-hidden text-base font-normal text-gray-500 truncate xl:max-w-xs dark:text-gray-400"
                                 >
                                     <div
@@ -726,70 +732,86 @@ watch(
                 <div>
                     <h3 class="text-md text-gray-500 dark:text-gray-400">
                         <span class="font-bold text-black dark:text-gray-400"
-                            >Email Status:
+                            >Job ID:
                         </span>
                     </h3>
-                    <p
-                        class="text-black dark:text-white"
-                        v-if="currentUserEmailIsVerified"
-                    >
-                        Verified
-                    </p>
-                    <p class="text-black dark:text-white" v-else>
-                        Not Verified
+                    <p class="text-black dark:text-white">
+                        {{ form.job_id }}
                     </p>
                 </div>
 
                 <div>
                     <h3 class="text-md text-gray-500 dark:text-gray-400">
                         <span class="font-bold text-black dark:text-gray-400"
-                            >Account Status:
+                            >Job Title:
                         </span>
                     </h3>
-                    <p
-                        class="text-black dark:text-white"
-                        v-if="currentUserIsActive"
-                    >
-                        Active
+                    <p class="text-black dark:text-white">
+                        {{ form.job_title }}
                     </p>
-                    <p class="text-black dark:text-white" v-else>Inactive</p>
+                </div>
+
+                <div>
+                    <h3 class="text-md text-gray-500 dark:text-gray-400">
+                        <span class="font-bold text-black dark:text-gray-400"
+                            >Location:
+                        </span>
+                    </h3>
+                    <p class="text-black dark:text-white">
+                        {{ form.location }}
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-md text-gray-500 dark:text-gray-400">
+                        <span class="font-bold text-black dark:text-gray-400"
+                            >Resume File Name:
+                        </span>
+                    </h3>
+                    <p class="text-black dark:text-white">
+                        {{ form.resume_name }}
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-md text-gray-500 dark:text-gray-400">
+                        <span class="font-bold text-black dark:text-gray-400"
+                            >Resume File Path:
+                        </span>
+                    </h3>
+                    <p class="break-words">
+                        <a
+                            target="_blank"
+                            :href="form.resume_file"
+                            class="text-blue-600 hover:text-blue-700 whitespace-normal dark:text-blue-500 dark:hover:text-blue-600"
+                        >
+                            {{ form.resume_file }}
+                        </a>
+                    </p>
                 </div>
             </div>
-
-            <div
-                class="bottom-0 left-0 flex justify-center w-full pb-4 space-x-4 md:px-4 absolute"
-            >
+<!-- 
+            <div class="flex justify-center w-full py-4 space-x-4">
                 <button
-                    @click="showUpdateModal(form)"
-                    class="text-white w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:bg-blue-200 dark:disabled:bg-blue-900"
+                    @click="showApproveModal(currentUpdatingUserID)"
+                    class="text-white w-full justify-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800 disabled:bg-green-200 dark:disabled:bg-green-900"
                 >
-                    Update
+                    Approve
                 </button>
 
                 <button
-                    v-if="currentUserIsActive"
-                    @click="showDeactivationModal(currentUpdatingUserID)"
+                    @click="showDisapproveModal(currentUpdatingUserID)"
                     type="button"
-                    id="deactivateUserButton"
+                    id="deleteJobsButton"
                     class="inline-flex w-full justify-center text-white items-center bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 rounded-lg text-sm font-medium px-5 py-2.5 focus:z-10 dark:bg-red-700 dark:hover:bg-red-900 dark:focus:ring-red-900"
                 >
-                    Deactivate
+                    Disapprove
                 </button>
-
-                <button
-                    v-else
-                    @click="showActivationModal(currentUpdatingUserID)"
-                    type="button"
-                    id="activateUserButton"
-                    class="inline-flex w-full justify-center text-white items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 rounded-lg text-sm font-medium px-5 py-2.5 focus:z-10 dark:bg-green-700 dark:hover:bg-green-900 dark:focus:ring-green-900"
-                >
-                    Activate
-                </button>
-            </div>
+            </div> -->
         </div>
     </Transition>
 
-    <!-- Update Modal -->
+    <!-- Disapprove Product Drawer -->
     <Transition
         enter-from-class="translate-x-full"
         enter-active-class="transition-transform translate-x-0"
@@ -797,163 +819,7 @@ watch(
         leave-to-class="translate-x-full"
     >
         <div
-            v-if="updateModalVisibility"
-            id="drawer-update-product-default"
-            class="fixed top-0 right-0 z-40 w-full h-screen max-w-xs p-4 overflow-y-auto bg-white dark:bg-gray-800"
-            tabindex="-1"
-            aria-labelledby="drawer-label"
-            aria-hidden="true"
-        >
-            <h5
-                id="drawer-label"
-                class="inline-flex items-center mb-6 text-sm font-semibold text-gray-500 uppercase dark:text-gray-400"
-            >
-                Update {{ title }}
-            </h5>
-            <button
-                type="button"
-                @click="hideUpdateModal"
-                aria-controls="drawer-update-product-default"
-                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-            >
-                <svg
-                    aria-hidden="true"
-                    class="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        fill-rule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clip-rule="evenodd"
-                    ></path>
-                </svg>
-                <span class="sr-only">Close</span>
-            </button>
-            <form @submit.prevent="update">
-                <div class="space-y-10">
-                    <div>
-                        <InputField
-                            id="firstName"
-                            v-model="form.first_name"
-                            type="text"
-                            label="First Name"
-                            placeholder="First Name"
-                            :error="form.errors.first_name"
-                        />
-                    </div>
-                    <div>
-                        <InputField
-                            id="middleName"
-                            v-model="form.middle_name"
-                            type="text"
-                            label="Middle Name"
-                            placeholder="Middle Name"
-                            :error="form.errors.middle_name"
-                        />
-                    </div>
-                    <div>
-                        <InputField
-                            id="lastName"
-                            v-model="form.last_name"
-                            type="text"
-                            label="Last Name"
-                            placeholder="Last Name"
-                            :error="form.errors.last_name"
-                        />
-                    </div>
-                    <div>
-                        <SelectInput
-                            id="gender"
-                            v-model="form.gender"
-                            label="Gender"
-                            :error="form.errors.gender"
-                            :canSearch="false"
-                        >
-                            <option value="" disabled selected hidden></option>
-
-                            <option
-                                value="Male"
-                                :selected="form.gender === 'Male'"
-                            >
-                                Male
-                            </option>
-                            <option
-                                value="Female"
-                                :selected="form.gender === 'Female'"
-                            >
-                                Female
-                            </option>
-                        </SelectInput>
-                    </div>
-                    <div>
-                        <InputField
-                            id="emailAddress"
-                            v-model="form.email"
-                            type="email"
-                            label="Email Address"
-                            placeholder="Email Address"
-                            :error="form.errors.email"
-                        />
-                    </div>
-                    <div>
-                        <InputField
-                            id="contactNumber"
-                            v-model="form.contact_number"
-                            type="contactNumber"
-                            label="Contact Number"
-                            placeholder="Contact Number"
-                            :error="form.errors.contact_number"
-                        />
-                    </div>
-                </div>
-                <div
-                    class="bottom-0 left-0 flex justify-center w-full pb-4 mt-4 space-x-4 sm:absolute sm:px-4 sm:mt-0"
-                >
-                    <button
-                        type="submit"
-                        class="w-full justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    >
-                        Update
-                    </button>
-                    <button
-                        @click="hideUpdateModal"
-                        type="button"
-                        aria-controls="drawer-create-product-default"
-                        class="inline-flex w-full justify-center text-gray-500 items-center bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                    >
-                        <svg
-                            aria-hidden="true"
-                            class="w-5 h-5 -ml-1 sm:mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            ></path>
-                        </svg>
-                        Cancel
-                    </button>
-                </div>
-            </form>
-        </div>
-    </Transition>
-
-    <!-- Deactivation Product Drawer -->
-    <Transition
-        enter-from-class="translate-x-full"
-        enter-active-class="transition-transform translate-x-0"
-        leave-active-class="transition-transform translate-x-0"
-        leave-to-class="translate-x-full"
-    >
-        <div
-            v-if="deactivationModalVisibility"
+            v-if="disapproveModalVisibility"
             id="drawer-delete-product-default"
             class="fixed top-0 right-0 z-40 w-full h-screen max-w-xs p-4 overflow-y-auto bg-white dark:bg-gray-800"
             tabindex="-1"
@@ -964,10 +830,10 @@ watch(
                 id="drawer-label"
                 class="inline-flex items-center text-sm font-semibold text-gray-500 uppercase dark:text-gray-400"
             >
-                Deactivate
+                Disapprove
             </h5>
             <button
-                @click="hideDeactivationModal"
+                @click="hideDisapproveModal"
                 type="button"
                 aria-controls="drawer-delete-product-default"
                 class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -1002,10 +868,10 @@ watch(
                 ></path>
             </svg>
             <h3 class="mb-6 text-lg text-gray-500 dark:text-gray-400">
-                Are you sure you want to deactivate this {{ title }}?
+                Are you sure you want to disapprove this {{ title }}?
             </h3>
 
-            <form @submit.prevent="deactivate" class="inline-block">
+            <form @submit.prevent="disapprove" class="inline-block">
                 <button
                     type="submit"
                     class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-red-900"
@@ -1014,7 +880,7 @@ watch(
                 </button>
             </form>
             <button
-                @click="hideDeactivationModal"
+                @click="hideDisapproveModal"
                 class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 border border-gray-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
                 data-modal-toggle="delete-product-modal"
             >
@@ -1023,7 +889,7 @@ watch(
         </div>
     </Transition>
 
-    <!-- Activation Product Drawer -->
+    <!-- Approve Product Drawer -->
     <Transition
         enter-from-class="translate-x-full"
         enter-active-class="transition-transform translate-x-0"
@@ -1031,7 +897,7 @@ watch(
         leave-to-class="translate-x-full"
     >
         <div
-            v-if="activationModalVisibility"
+            v-if="approveModalVisibility"
             id="drawer-delete-product-default"
             class="fixed top-0 right-0 z-40 w-full h-screen max-w-xs p-4 overflow-y-auto bg-white dark:bg-gray-800"
             tabindex="-1"
@@ -1042,10 +908,10 @@ watch(
                 id="drawer-label"
                 class="inline-flex items-center text-sm font-semibold text-gray-500 uppercase dark:text-gray-400"
             >
-                Activate
+                Approve
             </h5>
             <button
-                @click="hideActivationModal"
+                @click="hideApproveModal"
                 type="button"
                 aria-controls="drawer-delete-product-default"
                 class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -1080,9 +946,9 @@ watch(
                 ></path>
             </svg>
             <h3 class="mb-6 text-lg text-gray-500 dark:text-gray-400">
-                Are you sure you want to activate this {{ title }}?
+                Are you sure you want to approve this {{ title }}?
             </h3>
-            <form @submit.prevent="activate" class="inline-block">
+            <form @submit.prevent="approve" class="inline-block">
                 <button
                     type="submit"
                     class="text-white bg-green-600 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm inline-flex items-center px-3 py-2.5 text-center mr-2 dark:focus:ring-green-900"
@@ -1091,169 +957,11 @@ watch(
                 </button>
             </form>
             <button
-                @click="hideActivationModal"
+                @click="hideApproveModal"
                 class="text-gray-900 bg-white hover:bg-gray-100 focus:ring-4 focus:ring-blue-300 border border-gray-200 font-medium inline-flex items-center rounded-lg text-sm px-3 py-2.5 text-center dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
             >
                 No, cancel
             </button>
-        </div>
-    </Transition>
-
-    <!-- Add Product Drawer -->
-    <Transition
-        enter-from-class="translate-x-full"
-        enter-active-class="transition-transform translate-x-0"
-        leave-active-class="transition-transform translate-x-0"
-        leave-to-class="translate-x-full"
-    >
-        <div
-            id="drawer-create-product-default"
-            v-if="addModalVisibility"
-            class="fixed top-0 right-0 z-40 w-full h-screen max-w-xs p-4 overflow-y-auto bg-white dark:bg-gray-800"
-            tabindex="-1"
-            aria-labelledby="drawer-label"
-            aria-hidden="true"
-        >
-            <h5
-                id="drawer-label"
-                class="inline-flex items-center mb-6 text-sm font-semibold text-gray-500 uppercase dark:text-gray-400"
-            >
-                New {{ title }}
-            </h5>
-            <button
-                type="button"
-                @click="hideAddModal"
-                aria-controls="drawer-create-product-default"
-                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 absolute top-2.5 right-2.5 inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white"
-            >
-                <svg
-                    aria-hidden="true"
-                    class="w-5 h-5"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        fill-rule="evenodd"
-                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                        clip-rule="evenodd"
-                    ></path>
-                </svg>
-                <span class="sr-only">Close</span>
-            </button>
-            <form @submit.prevent="submit">
-                <div class="space-y-10">
-                    <div>
-                        <InputField
-                            id="firstName"
-                            v-model="form.first_name"
-                            type="text"
-                            label="First Name"
-                            placeholder="First Name"
-                            :error="form.errors.first_name"
-                        />
-                    </div>
-                    <div>
-                        <InputField
-                            id="middleName"
-                            v-model="form.middle_name"
-                            type="text"
-                            label="Middle Name"
-                            placeholder="Middle Name"
-                            :error="form.errors.middle_name"
-                        />
-                    </div>
-                    <div>
-                        <InputField
-                            id="lastName"
-                            v-model="form.last_name"
-                            type="text"
-                            label="Last Name"
-                            placeholder="Last Name"
-                            :error="form.errors.last_name"
-                        />
-                    </div>
-                    <div>
-                        <SelectInput
-                            id="gender"
-                            v-model="form.gender"
-                            label="Gender"
-                            :error="form.errors.gender"
-                            :canSearch="false"
-                        >
-                            <option value="" disabled selected hidden></option>
-
-                            <option
-                                value="Male"
-                                :selected="form.gender === 'Male'"
-                            >
-                                Male
-                            </option>
-                            <option
-                                value="Female"
-                                :selected="form.gender === 'Female'"
-                            >
-                                Female
-                            </option>
-                        </SelectInput>
-                    </div>
-                    <div>
-                        <InputField
-                            id="emailAddress"
-                            v-model="form.email"
-                            type="email"
-                            label="Email Address"
-                            placeholder="Email Address"
-                            :error="form.errors.email"
-                        />
-                    </div>
-                    <div>
-                        <InputField
-                            id="contactNumber"
-                            v-model="form.contact_number"
-                            type="contactNumber"
-                            label="Contact Number"
-                            placeholder="Contact Number"
-                            :error="form.errors.contact_number"
-                        />
-                    </div>
-                </div>
-                <div
-                    class="bottom-0 left-0 flex justify-center w-full pb-4 space-x-4 md:px-4 md:absolute"
-                >
-                    <button
-                        type="submit"
-                        :disabled="form.processing"
-                        class="text-white w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 disabled:bg-blue-200 dark:disabled:bg-blue-900"
-                    >
-                        Add
-                    </button>
-                    <button
-                        @click="hideAddModal"
-                        type="button"
-                        data-drawer-dismiss="drawer-create-product-default"
-                        aria-controls="drawer-create-product-default"
-                        class="inline-flex w-full justify-center text-gray-500 items-center bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600"
-                    >
-                        <svg
-                            aria-hidden="true"
-                            class="w-5 h-5 -ml-1 sm:mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            ></path>
-                        </svg>
-                        Cancel
-                    </button>
-                </div>
-            </form>
         </div>
     </Transition>
 </template>

@@ -22,9 +22,47 @@ class UserApplicantController extends Controller
 
         $filters = Request::only(['search']);
         $searchReq = Request::input('search');
+        $statusReq = Request::input('status');
+        $applicationsReq = Request::input('application');
 
         $applicants = Applicant::query()
         ->with(['user', 'applications'])
+        ->when($applicationsReq, function($query, $filter) {
+            // Check for the status value
+            if ($filter === 'Already Applied') {
+                $query->where(function ($query) use ($filter) {
+                    $query->whereHas('applications');
+                });
+            }
+
+            if ($filter === 'Not Yet Applied') {
+                $query->where(function ($query) use ($filter) {
+                    $query->whereDoesntHave('applications');
+                });
+            }
+        })
+        ->when($statusReq, function($query, $filter) {
+            $statusMapping = [
+                'Not Qualified' => 0,
+                'Pending' => 1,
+                'For Interview' => 2,
+                'In Progress' => 3,
+                'Qualified' => 4,
+                'Hired' => 5,
+            ];
+
+            $statusValue = $statusMapping[$filter] ?? null;
+
+            // Check for the status value
+            if ($statusValue !== null) {
+                $query->where(function ($query) use ($statusValue) {
+                    $query->whereHas('applications', function ($query) use ($statusValue) {
+                        $query->where('status', $statusValue);
+                    });
+                });
+                
+            }
+        })
         ->when($searchReq, function($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->whereHas('user', function ($query) use ($search) {
@@ -130,7 +168,7 @@ class UserApplicantController extends Controller
         }
 
 
-        return Inertia::render('Applicants', [
+        return Inertia::render('HrStaffApplicants', [
             'applicants' => $applicants,
             'filters' => $filters,
             'pagination' => [

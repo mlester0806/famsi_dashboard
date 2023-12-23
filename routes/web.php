@@ -22,6 +22,7 @@ use App\Http\Controllers\QualificationController;
 use App\Http\Controllers\QualifiedController;
 use App\Http\Controllers\ForInterviewController;
 use App\Http\Controllers\InProgressController;
+use App\Http\Controllers\HrManagerApplicationController;
 use App\Models\Applicant;
 use App\Models\Application;
 use App\Models\HrManager;
@@ -187,13 +188,7 @@ Route::middleware([
                 return Inertia::render('Dashboard', [
                     'totalHrStaffs' => HrStaff::count(),
                     'totalUserApplicants' => Applicant::count(),
-                    'totalDisqualified' => Application::where('status', 0)->count(),
-                    'totalApplications' => Application::where('status', 1)->count(),
-                    'totalForInterview' => Application::where('status', 2)->count(),
-                    'totalInProgress' => Application::where('status', 3)->count(),
-                    'totalQualified' => Application::where('status', 4)->count(),
-                    'totalHired' => Application::where('status', 5)->count(),
-                    'totalDocuments' => Document::count(),
+                    'totalApplications' => Application::count(),
                 ]);
             })->name('index');
         });
@@ -233,13 +228,13 @@ Route::middleware([
         });
 
         Route::group(['prefix' => 'applications', 'as' => 'applications.'], function() {
-            Route::get('/', [ApplicationController::class, 'index'])->name('index');
+            Route::get('/', [HrManagerApplicationController::class, 'index'])->name('index');
 
-            Route::post('/store', [ApplicationController::class, 'store'])->name('store');
+            Route::post('/store', [HrManagerApplicationController::class, 'store'])->name('store');
 
-            Route::put('/approve/{id}', [ApplicationController::class, 'approve'])->name('approve');
+            Route::put('/approve/{id}', [HrManagerApplicationController::class, 'approve'])->name('approve');
 
-            Route::put('/disapprove/{id}', [ApplicationController::class, 'disapprove'])->name('disapprove');
+            Route::put('/disapprove/{id}', [HrManagerApplicationController::class, 'disapprove'])->name('disapprove');
         });
 
         Route::group(['prefix' => 'for-interview', 'as' => 'for-interview.'], function() {

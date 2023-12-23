@@ -131,7 +131,6 @@ const currentUser = computed(() => {
             <SidebarCategory
                 name="Users"
                 v-if="
-                    $page.props.auth.user.user_type == users.hr_manager ||
                     $page.props.auth.user.user_type == users.hr_staff
                 "
             >
@@ -160,7 +159,36 @@ const currentUser = computed(() => {
             <SidebarCategory
                 name="Recruitments"
                 v-if="
-                    $page.props.auth.user.user_type == users.hr_manager ||
+
+                    $page.props.auth.user.user_type == users.hr_manager
+                "
+            >
+                <template #tab>
+                    <li>
+                        <SidebarTab
+                            :href="route(`${currentUser}.applications.index`)"
+                            :class="[
+                                $page.url.includes('applications') &&
+                                    'bg-gray-100 dark:bg-gray-700',
+                            ]"
+                        >
+                            <template #icon>
+                                <font-awesome-icon
+                                    class="w-6 h-6 mr-3 text-gray-500 transition duration-0 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                                    :icon="['fas', 'scroll']"
+                                />
+                            </template>
+
+                            <template #title> Applications </template>
+                        </SidebarTab>
+                    </li>
+                </template>
+            </SidebarCategory>
+
+            <SidebarCategory
+                name="Recruitments"
+                v-if="
+
                     $page.props.auth.user.user_type == users.hr_staff
                 "
             >
@@ -468,12 +496,12 @@ const currentUser = computed(() => {
             <SidebarCategory
                 name="Interview Related"
                 v-if="
-                    $page.props.auth.user.user_type == users.hr_manager ||
                     $page.props.auth.user.user_type == users.hr_staff
                 "
             >
                 <template #tab>
-                    <li>
+                    <li
+                >
                         <SidebarTab
                             :href="route(`${currentUser}.appointments.index`)"
                             :class="[
