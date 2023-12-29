@@ -26,7 +26,6 @@ const currentUser = computed(() => {
         >
             <SidebarCategory
                 v-if="$page.props.auth.user.user_type == users.admin ||
-                $page.props.auth.user.user_type == users.hr_manager ||
                 $page.props.auth.user.user_type == users.hr_staff"
                 name="Menu"
             >
@@ -47,6 +46,32 @@ const currentUser = computed(() => {
                             </template>
 
                             <template #title> Dashboard </template>
+                        </SidebarTab>
+                    </li>
+                </template>
+            </SidebarCategory>
+
+            <SidebarCategory
+                v-if="$page.props.auth.user.user_type == users.hr_manager"
+                name="Menu"
+            >
+                <template #tab>
+                    <li>
+                        <SidebarTab
+                            :href="route(`${currentUser}.reports.index`)"
+                            :class="[
+                                $page.url.includes('reports') &&
+                                    'bg-gray-100 dark:bg-gray-700',
+                            ]"
+                        >
+                            <template #icon>
+                                <font-awesome-icon
+                                    class="w-6 h-6 mr-3 text-gray-500 transition duration-0 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+                                    :icon="['fas', 'gauge']"
+                                />
+                            </template>
+
+                            <template #title> Reports </template>
                         </SidebarTab>
                     </li>
                 </template>

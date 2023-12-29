@@ -282,7 +282,7 @@ watch(
                             <option value="" disabled selected hidden></option>
 
                             <option
-                                value=""
+                                value="All"
                                 :selected="filterStatus !== 'Pending' || filterStatus !== 'For Interview' || filterStatus !== 'In Progress' || filterStatus !== 'Qualified' || filterStatus !== 'Disqualified' || filterStatus !== 'Hired'"
                             >
                                 All
@@ -317,12 +317,6 @@ watch(
                                 :selected="filterStatus === 'Disqualified'"
                             >
                                 Disqualified
-                            </option>
-                            <option
-                                value="Hired"
-                                :selected="filterStatus === 'Hired'"
-                            >
-                                Hired
                             </option>
                         </SelectInput>
                     </div>

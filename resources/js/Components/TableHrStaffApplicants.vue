@@ -40,6 +40,7 @@ const toast = useToast();
 let search = ref(props.filters.search);
 let filterStatus = ref(props.filters.filterStatus);
 let alreadyApplied = ref(props.filters.application);
+let dateHired = ref(props.filters.date);
 
 let currentUpdatingUserID = ref(null);
 let currentUserIsActive = ref(null);
@@ -257,11 +258,17 @@ watch(
         if (value) {
             query.search = value;
         }
+
         if(filterStatus.value) {
             query.status = filterStatus.value;
         }
+
         if(alreadyApplied.value) {
             query.application = alreadyApplied.value;
+        }
+
+        if (dateHired.value) {
+            query.date = dateHired.value;
         }
 
         router.get(`/${page.props.user.role}/${props.linkName}`, query, {
@@ -287,6 +294,10 @@ watch(
             query.application = alreadyApplied.value;
         }
 
+        if (dateHired.value) {
+            query.date = dateHired.value;
+        }
+
         router.get(`/${page.props.user.role}/${props.linkName}`, query, {
             preserveState: true,
             replace: true,
@@ -308,6 +319,37 @@ watch(
 
         if (filterStatus.value) {
             query.status = filterStatus.value;
+        }
+
+        if (dateHired.value) {
+            query.date = dateHired.value;
+        }
+
+        router.get(`/${page.props.user.role}/${props.linkName}`, query, {
+            preserveState: true,
+            replace: true,
+        });
+    }, 500)
+);
+
+watch(
+    dateHired,
+    debounce((value) => {
+        const query = {};
+        if (value) {
+            query.date = value;
+        }
+
+        if (search.value) {
+            query.search = search.value;
+        }
+
+        if (filterStatus.value) {
+            query.status = filterStatus.value;
+        }
+
+        if (alreadyApplied.value) {
+            query.application = alreadyApplied.value;
         }
 
         router.get(`/${page.props.user.role}/${props.linkName}`, query, {
@@ -403,7 +445,7 @@ watch(
             <div
                 class="items-center justify-between block sm:flex md:divide-x md:divide-gray-100 dark:divide-gray-700"
             >
-                <div class="flex items-center mb-4 sm:mb-0">
+                <div class="flex items-center mb-4">
                     <div class="relative w-48 mt-1 sm:w-64 xl:w-96">
                         <InputField
                             id="search"
@@ -412,6 +454,43 @@ watch(
                             label="Search"
                             placeholder="Search"
                         />
+                    </div>
+                </div>
+               
+            </div>
+            <div
+                class="items-center justify-between block sm:flex md:divide-x md:divide-gray-100 dark:divide-gray-700"
+            >
+            <div class="flex items-center mb-4 sm:mb-0">
+                    <div class="relative w-48 sm:w-64">
+                        <SelectInput
+                            id="dateHired"
+                            v-model="dateHired"
+                            label="Select Date"
+                            :canSearch="false"
+                        >
+                            <option value="" disabled selected hidden></option>
+
+                            <option
+                                value="All"
+                                :selected="filterStatus !== 'Last Week' || filterStatus !== 'Last Month'"
+                            >
+                                All
+                            </option>
+                            <option
+                                value="Last Week"
+                                :selected="filterStatus === 'Last Week'"
+                            >
+                                Last Week
+                            </option>
+                            <option
+                                value="Last Month"
+                                :selected="filterStatus === 'Last Month'"
+                            >
+                                Last Month
+                            </option>
+
+                        </SelectInput>
                     </div>
                 </div>
                 <div class="flex items-center mb-4 sm:mb-0">
@@ -499,6 +578,12 @@ watch(
                             >
                                 Hired
                             </option>
+                            <option
+                                value="Resigned"
+                                :selected="filterStatus === 'Resigned'"
+                            >
+                                Resigned
+                            </option>
                         </SelectInput>
                     </div>
                 </div>
@@ -515,6 +600,7 @@ watch(
                     />
                     Add new {{ title }}
                 </button>
+               
             </div>
         </div>
     </div>

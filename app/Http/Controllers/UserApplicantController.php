@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Carbon\Carbon;
 
 class UserApplicantController extends Controller
 {
@@ -24,9 +25,30 @@ class UserApplicantController extends Controller
         $searchReq = Request::input('search');
         $statusReq = Request::input('status');
         $applicationsReq = Request::input('application');
+        $dateHiredReq = Request::input('date');
 
         $applicants = Applicant::query()
         ->with(['user', 'applications'])
+        ->when($dateHiredReq, function($query, $filter) {
+            // Check for the status value
+            if ($filter === 'Last Week') {
+                $query->where(function ($query) use ($filter) {
+                    $lastWeekStartDate = Carbon::now()->subWeek()->startOfWeek();
+                    $lastWeekEndDate = Carbon::now()->subWeek()->endOfWeek();
+
+                    $query->whereBetween('created_at', [$lastWeekStartDate, $lastWeekEndDate]);
+                });
+            }
+
+            if ($filter === 'Last Month') {
+                $query->where(function ($query) use ($filter) {
+                    $lastMonthStartDate = Carbon::now()->startOfMonth();
+                    $lastMonthEndDate = Carbon::now();
+
+                    $query->whereBetween('created_at', [$lastMonthStartDate, $lastMonthEndDate]);
+                });
+            }
+        })
         ->when($applicationsReq, function($query, $filter) {
             // Check for the status value
             if ($filter === 'Already Applied') {

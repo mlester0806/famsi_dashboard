@@ -23,6 +23,7 @@ use App\Http\Controllers\QualifiedController;
 use App\Http\Controllers\ForInterviewController;
 use App\Http\Controllers\InProgressController;
 use App\Http\Controllers\HrManagerApplicationController;
+use App\Http\Controllers\ReportController;
 use App\Models\Applicant;
 use App\Models\Application;
 use App\Models\HrManager;
@@ -183,14 +184,8 @@ Route::middleware([
     });
 
     Route::group(['middleware' => 'role:hr-manager', 'prefix' => 'hr-manager', 'as' => 'hr-manager.'], function () {
-        Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function() {
-            Route::get('/', function () {
-                return Inertia::render('Dashboard', [
-                    'totalHrStaffs' => HrStaff::count(),
-                    'totalUserApplicants' => Applicant::count(),
-                    'totalApplications' => Application::count(),
-                ]);
-            })->name('index');
+        Route::group(['prefix' => 'reports', 'as' => 'reports.'], function() {
+            Route::get('/', [ReportController::class, 'index'])->name('index');
         });
 
         Route::group(['prefix' => 'appointments', 'as' => 'appointments.'], function() {

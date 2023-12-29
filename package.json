@@ -32,6 +32,7 @@
         "@tailwindcss/line-clamp": "^0.4.4",
         "@vueup/vue-quill": "^1.2.0",
         "@vueuse/core": "^10.2.0",
+        "chart.js": "^4.4.1",
         "date-fns": "^2.30.0",
         "date-fns-tz": "^2.0.0",
         "filepond": "^4.30.4",
@@ -39,6 +40,7 @@
         "filepond-plugin-image-preview": "^4.6.11",
         "lodash.debounce": "^4.0.8",
         "tw-elements": "^1.0.0-beta3",
+        "vue-chartjs": "^5.3.0",
         "vue-filepond": "^7.0.3",
         "vue-loading-overlay": "^6.0.3",
         "vue-toastification": "^2.0.0-rc.5"
