@@ -15,7 +15,8 @@ class Application extends Model
         'job_position_id',
         'file_name',
         'file_path',
-        'status'
+        'status',
+        'notes'
     ];
 
     public function applicant(): BelongsTo

@@ -24,6 +24,7 @@ class QualifiedController extends Controller
 
         $filters = Request::only(['search']);
         $searchReq = Request::input('search');
+        $jobPositions = JobPosition::all();
 
         $qualified = Application::query()
         ->where('status', 4)
@@ -143,6 +144,7 @@ class QualifiedController extends Controller
         return Inertia::render('Qualified', [
             'qualified' => $qualified,
             'filters' => $filters,
+            'jobPositions' => $jobPositions,
             'pagination' => [
                 'current_page' => $currentPage,
                 'last_page' => $lastPage,
@@ -183,12 +185,21 @@ class QualifiedController extends Controller
         //
     }
 
-    /**
+    /** 
      * Update the specified resource in storage.
      */
     public function update($id)
     {
-        //
+        $applicantValidate = Request::validate([
+            'job_id' => ['required'],
+        ]);
+
+        $application = Application::findOrFail($id);
+        $jobPosition = JobPosition::findOrFail($applicantValidate['job_id']);
+
+        $application->job_position_id = $applicantValidate['job_id'];
+
+        $application->save();
     }
 
 

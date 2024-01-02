@@ -24,6 +24,7 @@ class ApplicationController extends Controller
 
         $filters = Request::only(['search']);
         $searchReq = Request::input('search');
+        $jobPositions = JobPosition::all();
 
         $applications = Application::query()
         ->where('status', 1)
@@ -143,6 +144,7 @@ class ApplicationController extends Controller
         return Inertia::render('Applications', [
             'applications' => $applications,
             'filters' => $filters,
+            'jobPositions' => $jobPositions,
             'pagination' => [
                 'current_page' => $currentPage,
                 'last_page' => $lastPage,
@@ -188,7 +190,16 @@ class ApplicationController extends Controller
      */
     public function update($id)
     {
-        //
+        $applicantValidate = Request::validate([
+            'job_id' => ['required'],
+        ]);
+
+        $application = Application::findOrFail($id);
+        $jobPosition = JobPosition::findOrFail($applicantValidate['job_id']);
+
+        $application->job_position_id = $applicantValidate['job_id'];
+
+        $application->save();
     }
 
     /**

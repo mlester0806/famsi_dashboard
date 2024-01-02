@@ -313,10 +313,22 @@ watch(
                                 Qualified
                             </option>
                             <option
-                                value="Disqualified"
-                                :selected="filterStatus === 'Disqualified'"
+                                value="Hired"
+                                :selected="filterStatus === 'Hired'"
                             >
-                                Disqualified
+                                Hired
+                            </option>
+                            <option
+                                value="Resigned"
+                                :selected="filterStatus === 'Resigned'"
+                            >
+                                Resigned
+                            </option>
+                            <option
+                                value="Not Qualified"
+                                :selected="filterStatus === 'Not Qualified'"
+                            >
+                                Not Qualified
                             </option>
                         </SelectInput>
                     </div>
@@ -560,6 +572,16 @@ watch(
                                             class="h-2.5 w-2.5 rounded-full bg-green-400 mr-2"
                                         ></div>
                                         Hired
+                                    </div>
+
+                                    <div
+                                        v-else-if="role.status === 6"
+                                        class="flex items-center"
+                                    >
+                                        <div
+                                            class="h-2.5 w-2.5 rounded-full bg-black mr-2"
+                                        ></div>
+                                        Resigned
                                     </div>
 
                                     <div v-else class="flex items-center">

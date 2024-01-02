@@ -118,6 +118,8 @@ Route::middleware([
             Route::put('/approve/{id}', [ApplicationController::class, 'approve'])->name('approve');
 
             Route::put('/disapprove/{id}', [ApplicationController::class, 'disapprove'])->name('disapprove');
+        
+            Route::put('/update/{id}', [ApplicationController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'for-interview', 'as' => 'for-interview.'], function() {
@@ -128,6 +130,8 @@ Route::middleware([
             Route::put('/approve/{id}', [ForInterviewController::class, 'approve'])->name('approve');
 
             Route::put('/disapprove/{id}', [ForInterviewController::class, 'disapprove'])->name('disapprove');
+        
+            Route::put('/update/{id}', [ForInterviewController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'in-progress', 'as' => 'in-progress.'], function() {
@@ -138,6 +142,8 @@ Route::middleware([
             Route::put('/approve/{id}', [InProgressController::class, 'approve'])->name('approve');
 
             Route::put('/disapprove/{id}', [InProgressController::class, 'disapprove'])->name('disapprove');
+        
+            Route::put('/update/{id}', [InProgressController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'qualified', 'as' => 'qualified.'], function() {
@@ -146,12 +152,16 @@ Route::middleware([
             Route::put('/hire/{id}', [QualifiedController::class, 'hire'])->name('hire');
 
             Route::put('/disapprove/{id}', [QualifiedController::class, 'disapprove'])->name('disapprove');
+        
+            Route::put('/update/{id}', [QualifiedController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'disqualified', 'as' => 'disqualified.'], function() {
             Route::get('/', [DisqualifiedController::class, 'index'])->name('index');
 
             Route::put('/approve/{id}', [DisqualifiedController::class, 'approve'])->name('approve');
+        
+            Route::put('/update/{id}', [DisqualifiedController::class, 'update'])->name('update');
         });
 
         Route::group(['prefix' => 'hired', 'as' => 'hired.'], function() {

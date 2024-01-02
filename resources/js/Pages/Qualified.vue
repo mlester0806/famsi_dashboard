@@ -6,6 +6,7 @@ defineProps({
     qualified: Object,
     pagination: Object,
     filters: Object,
+    jobPositions: Array,
 });
 </script>
 
@@ -15,6 +16,7 @@ defineProps({
             :roles="qualified"
             :pagination="pagination"
             :filters="filters"
+            :jobPositions="jobPositions"
             linkName="qualified"
             title="Qualified"
         >

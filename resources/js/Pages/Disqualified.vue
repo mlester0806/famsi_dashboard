@@ -6,6 +6,7 @@ defineProps({
     disqualified: Object,
     pagination: Object,
     filters: Object,
+    jobPositions: Array,
 });
 </script>
 
@@ -15,6 +16,7 @@ defineProps({
             :roles="disqualified"
             :pagination="pagination"
             :filters="filters"
+            :jobPositions="jobPositions"
             linkName="disqualified"
             title="Disqualified"
         >

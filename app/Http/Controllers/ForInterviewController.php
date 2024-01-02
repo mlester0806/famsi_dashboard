@@ -24,6 +24,7 @@ class ForInterviewController extends Controller
 
         $filters = Request::only(['search']);
         $searchReq = Request::input('search');
+        $jobPositions = JobPosition::all();
 
         $applications = Application::query()
         ->where('status', 2)
@@ -143,6 +144,7 @@ class ForInterviewController extends Controller
         return Inertia::render('ForInterview', [
             'applications' => $applications,
             'filters' => $filters,
+            'jobPositions' => $jobPositions,
             'pagination' => [
                 'current_page' => $currentPage,
                 'last_page' => $lastPage,
@@ -183,12 +185,21 @@ class ForInterviewController extends Controller
         //
     }
 
-    /**
+        /**
      * Update the specified resource in storage.
      */
     public function update($id)
     {
-        //
+        $applicantValidate = Request::validate([
+            'job_id' => ['required'],
+        ]);
+
+        $application = Application::findOrFail($id);
+        $jobPosition = JobPosition::findOrFail($applicantValidate['job_id']);
+
+        $application->job_position_id = $applicantValidate['job_id'];
+
+        $application->save();
     }
 
     /**
@@ -196,6 +207,7 @@ class ForInterviewController extends Controller
      */
     public function approve($id)
     {
+
         $application = Application::findOrFail($id);
 
         $applicantUser = Applicant::findOrFail($application->applicant_id);
@@ -203,6 +215,10 @@ class ForInterviewController extends Controller
         $jobPosition = JobPosition::findOrFail($application->job_position_id);
 
         $application->status = 3;
+
+        if(Request::input('notes')) { 
+            $application->notes = Request::input('notes');
+        }
 
         Facade::message()->send($applicantUser->contact_number, 'Hi, ' . $applicantUser->first_name . '. I hope this message finds you well. Following a thorough review of your resume and the recent interview, we are pleased to inform you that you have successfully passed this stage of the application process. To move forward in the hiring process, we kindly ask you to complete the remaining requirements. Congratulations!');
 

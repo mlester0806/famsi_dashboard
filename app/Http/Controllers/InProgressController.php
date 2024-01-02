@@ -24,6 +24,7 @@ class InProgressController extends Controller
 
         $filters = Request::only(['search']);
         $searchReq = Request::input('search');
+        $jobPositions = JobPosition::all();
 
         $applications = Application::query()
         ->where('status', 3)
@@ -72,7 +73,8 @@ class InProgressController extends Controller
             'title' => $application->jobPosition->title,
             'location' => $application->jobPosition->location,
             'schedule' => $application->jobPosition->schedule,
-            'status' => $application->status
+            'status' => $application->status,
+            'notes' => $application->notes,
         ]);
 
         if (empty($searchReq)) {
@@ -143,6 +145,7 @@ class InProgressController extends Controller
         return Inertia::render('InProgress', [
             'applications' => $applications,
             'filters' => $filters,
+            'jobPositions' => $jobPositions,
             'pagination' => [
                 'current_page' => $currentPage,
                 'last_page' => $lastPage,
@@ -188,7 +191,16 @@ class InProgressController extends Controller
      */
     public function update($id)
     {
-        //
+        $applicantValidate = Request::validate([
+            'job_id' => ['required'],
+        ]);
+
+        $application = Application::findOrFail($id);
+        $jobPosition = JobPosition::findOrFail($applicantValidate['job_id']);
+
+        $application->job_position_id = $applicantValidate['job_id'];
+
+        $application->save();
     }
 
     /**

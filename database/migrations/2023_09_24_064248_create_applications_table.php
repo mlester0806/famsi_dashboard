@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('file_name');
             $table->string('file_path');
             $table->tinyInteger('status');
+            $table->text('notes')->nullable();
+            $table->json('additional_files')->nullable();
             $table->timestamps();
         });
     }

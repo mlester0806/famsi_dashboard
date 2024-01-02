@@ -6,6 +6,7 @@ defineProps({
     applications: Object,
     pagination: Object,
     filters: Object,
+    jobPositions: Array,
 });
 </script>
 
@@ -15,6 +16,7 @@ defineProps({
             :roles="applications"
             :pagination="pagination"
             :filters="filters"
+            :jobPositions="jobPositions"
             linkName="in-progress"
             title="In Progress"
         >

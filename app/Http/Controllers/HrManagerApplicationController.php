@@ -36,24 +36,24 @@ class HrManagerApplicationController extends Controller
                 'In Progress' => 3,
                 'Qualified' => 4,
                 'Hired' => 5,
+                'Resigned' => 6,
             ];
 
             $statusValue = $statusMapping[$filter] ?? null;
 
-            $query->where(function ($query) use ($filter) {
-                $query->whereHas('applicant', function ($query) use ($filter) {
-                    $query->whereRaw('LOWER(first_name) LIKE LOWER(?)', ['%' . $filter . '%'])
-                    ->orWhereRaw('LOWER(middle_name) LIKE LOWER(?)', ['%' . $filter . '%'])
-                    ->orWhereRaw('LOWER(last_name) LIKE LOWER(?)', ['%' . $filter . '%']);
-                });
-                $query->orWhereHas('jobPosition', function ($query) use ($filter) {
-                    $query->whereRaw('LOWER(title) LIKE LOWER(?)', ['%' . $filter . '%']);
-                });
-            });
+            // $query->where(function ($query) use ($filter) {
+            //     $query->whereHas('applicant', function ($query) use ($filter) {
+            //         $query->whereRaw('LOWER(first_name) LIKE LOWER(?)', ['%' . $filter . '%'])
+            //         ->orWhereRaw('LOWER(middle_name) LIKE LOWER(?)', ['%' . $filter . '%'])
+            //         ->orWhereRaw('LOWER(last_name) LIKE LOWER(?)', ['%' . $filter . '%']);
+            //     });
+            //     $query->orWhereHas('jobPosition', function ($query) use ($filter) {
+            //         $query->whereRaw('LOWER(title) LIKE LOWER(?)', ['%' . $filter . '%']);
+            //     });
+            // });
 
-            // Check for the status value
             if ($statusValue !== null) {
-                $query->orWhere('status', $statusValue);
+                $query->where('status', $statusValue);
             }
         })
         ->when($searchReq, function($query, $search) {
