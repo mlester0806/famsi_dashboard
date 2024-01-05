@@ -73,7 +73,9 @@ class QualifiedController extends Controller
             'title' => $qualify->jobPosition->title,
             'location' => $qualify->jobPosition->location,
             'schedule' => $qualify->jobPosition->schedule,
-            'status' => $qualify->status
+            'status' => $qualify->status,
+            'notes' => $qualify->notes,
+            'additional_files' => $qualify->additional_files,
         ]);
 
         if (empty($searchReq)) {

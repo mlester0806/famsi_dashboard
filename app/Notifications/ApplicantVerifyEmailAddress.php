@@ -36,10 +36,12 @@ class ApplicantVerifyEmailAddress extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $verificationUrl = $this->verificationUrl($notifiable);
+        $hostedSite = 'https://famsi-web.site';
+        $localSite = 'http://localhost:3000';
 
         return (new MailMessage)
                     ->line('Please click the button below to verify your email address.')
-                    ->action('Verify Email Address', 'https://famsi-web.site' . $verificationUrl)
+                    ->action('Verify Email Address', $hostedSite . $verificationUrl)
                     ->line('Thank you for registering!');
     }
 

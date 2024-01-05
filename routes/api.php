@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiApplicationController;
+use App\Http\Controllers\ApiUploadRequirementsController;
 use App\Http\Controllers\ApiJobPositionController;
 use App\Http\Controllers\ApiJobRelatedController;
 use App\Http\Controllers\ApiUserApplicationsController;
@@ -53,6 +54,7 @@ Route::get('job-positions/details/{id}/{slug}', [ApiJobPositionController::class
 Route::get('job-positions/related-jobs/{id}', [ApiJobPositionController::class, 'findRelatedJobs']);
 
 Route::post('application', [ApiApplicationController::class, 'application']);
+Route::post('upload-requirements', [ApiUploadRequirementsController::class, 'uploadRequirements']);
 Route::get('my-applications/{id}', [ApiUserApplicationsController::class, 'myApplications']);
 
 

@@ -75,6 +75,7 @@ class InProgressController extends Controller
             'schedule' => $application->jobPosition->schedule,
             'status' => $application->status,
             'notes' => $application->notes,
+            'additional_files' => $application->additional_files,
         ]);
 
         if (empty($searchReq)) {
@@ -193,12 +194,14 @@ class InProgressController extends Controller
     {
         $applicantValidate = Request::validate([
             'job_id' => ['required'],
+            'notes' => ['required'],
         ]);
 
         $application = Application::findOrFail($id);
         $jobPosition = JobPosition::findOrFail($applicantValidate['job_id']);
 
         $application->job_position_id = $applicantValidate['job_id'];
+        $application->notes = $applicantValidate['notes'];
 
         $application->save();
     }

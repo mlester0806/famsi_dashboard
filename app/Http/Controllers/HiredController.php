@@ -72,7 +72,9 @@ class HiredController extends Controller
             'title' => $hire->jobPosition->title,
             'location' => $hire->jobPosition->location,
             'schedule' => $hire->jobPosition->schedule,
-            'status' => $hire->status
+            'status' => $hire->status,
+            'notes' => $hire->notes,
+            'additional_files' => $hire->additional_files,
         ]);
 
         if (empty($searchReq)) {
