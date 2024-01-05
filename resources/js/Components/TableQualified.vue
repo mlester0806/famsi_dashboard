@@ -180,11 +180,13 @@ const showInfoModal = (data) => {
     form.application_status = data.status;
     form.notes = data.notes;
 
-    const parsedAdditionalFiles = JSON.parse(data.additional_files);
+    if (data.additional_files) {
+        const parsedAdditionalFiles = JSON.parse(data.additional_files);
 
-    Object.keys(parsedAdditionalFiles).forEach((key) => {
-        form[key] = parsedAdditionalFiles[key];
-    });
+        Object.keys(parsedAdditionalFiles).forEach((key) => {
+            form[key] = parsedAdditionalFiles[key];
+        });
+    }
 
     document.body.classList.add("overflow-hidden");
 
