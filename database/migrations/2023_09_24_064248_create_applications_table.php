@@ -20,6 +20,7 @@ return new class extends Migration
             $table->tinyInteger('status');
             $table->text('notes')->nullable();
             $table->json('additional_files')->nullable();
+            $table->json('famsi_files')->nullable();
             $table->timestamps();
         });
     }

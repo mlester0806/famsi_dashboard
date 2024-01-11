@@ -16,7 +16,9 @@ class Application extends Model
         'file_name',
         'file_path',
         'status',
-        'notes'
+        'notes',
+        'additional_files',
+        'famsi_files'
     ];
 
     public function applicant(): BelongsTo

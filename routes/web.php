@@ -24,6 +24,7 @@ use App\Http\Controllers\ForInterviewController;
 use App\Http\Controllers\InProgressController;
 use App\Http\Controllers\HrManagerApplicationController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\EmployeesDocumentsController;
 use App\Models\Applicant;
 use App\Models\Application;
 use App\Models\HrManager;
@@ -190,6 +191,12 @@ Route::middleware([
             Route::put('/update/{id}', [DocumentsController::class, 'update'])->name('update');
 
             Route::delete('/destroy/{id}', [DocumentsController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::group(['prefix' => 'employees-documents', 'as' => 'employees-documents.'], function() {
+            Route::get('/', [EmployeesDocumentsController::class, 'index'])->name('index');
+
+            Route::post('/update/{id}', [EmployeesDocumentsController::class, 'update'])->name('update');
         });
     });
 
