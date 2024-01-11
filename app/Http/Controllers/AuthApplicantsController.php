@@ -15,6 +15,7 @@ use App\Notifications\ApplicantForgotPassword;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 class AuthApplicantsController extends Controller
 {
@@ -111,6 +112,64 @@ class AuthApplicantsController extends Controller
                 // reCAPTCHA verification failed
                 return response()->json(['success' => false, 'message' => 'reCAPTCHA verification failed'], 422);
             }
+        } else if ($user->user_type === 0 && !$user->email_verified_at) {
+            return response()->json(['error' => 'You need to verify your email first.', 'title' => "Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.", 'message' => "Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another."], 401);
+        } else {
+            return response()->json(['error' => 'These credentials do not match our records.'], 401);
+        }
+    } else {
+        return response()->json(['error' => 'These credentials do not match our records.'], 401);
+    }
+}
+
+    // Log in using google account
+    public function googleLogin(Request $request)
+    {
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'family_name' => 'required|string',
+        'given_name' => 'required|string',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['error' => $validator->errors()], 422);
+    }
+
+    $checkUserEmail = User::where('email', $request->input('email'))->first();
+
+    $user = null;
+    if(!$checkUserEmail) {
+        $user = User::create([
+            'email' => $request->input('email'),
+            'password' => Hash::make('12345678'),
+            'user_type' => 0,
+            'is_active' => 1
+        ]);
+
+        $user->markEmailAsVerified();
+    
+        Applicant::create([
+            'user_id' => $user->id,
+            'first_name' => $request->input('given_name'),
+            'middle_name' => '',
+            'last_name' => $request->input('family_name'),
+            'gender' => '',
+            'contact_number' => '',
+        ]);
+    }
+
+    $credentials = [
+        'email' => $request->input('email'),
+        'password' => '12345678',
+    ];
+
+    if (Auth::attempt($credentials)) {
+        $user = Auth::user();
+
+        if ($user->user_type === 0 && $user->email_verified_at) {
+            $token = $user->createToken('Applicant Dashboard')->plainTextToken;
+
+            return response()->json(['token' => $token], 200);
         } else if ($user->user_type === 0 && !$user->email_verified_at) {
             return response()->json(['error' => 'You need to verify your email first.', 'title' => "Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another.", 'message' => "Before continuing, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another."], 401);
         } else {

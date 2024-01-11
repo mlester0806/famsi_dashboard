@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 // Authenticating and signing up user
 Route::post('login', [AuthApplicantsController::class, 'login']);
+Route::post('google-login', [AuthApplicantsController::class, 'googleLogin']);
 Route::post('register', [AuthApplicantsController::class, 'register']);
 Route::post('verify-email', [AuthApplicantsController::class, 'verifyEmail']);
 Route::post('verify-forgot-pass', [AuthApplicantsController::class, 'verifyForgotPass']);
